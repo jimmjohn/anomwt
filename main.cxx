@@ -53,7 +53,7 @@ int main(int argc, char** argv) {
         if (reader.failed()) break;
         // Skip empty lines
 
-        //if(nevts > 1000000) break; // Limit to 100000 events
+        if(nevts > 10000) break; // Limit to 100000 events
         evtIn = {};
         if(nevts<printEvts){std::cout<< "\n"<< "Evt number: "<<nevts<<std::endl;}
         if(nevts%1000000==0){std::cout<< "\n"<< "Evt number: "<<nevts<<std::endl;}
