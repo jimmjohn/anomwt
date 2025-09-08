@@ -20,7 +20,7 @@
 
 int main(int argc, char** argv) {
     TApplication theApp("App", &argc, argv);  // removes ROOT args like -b, etc.
-    const char* filename = theApp.Argv()[1];//argv[1] will not work as TApplication eats ROOT options (like -b, -q, etc.), and rewrites argc/argv
+    const char* filename = "hepmc.out";//argv[1] will not work as TApplication eats ROOT options (like -b, -q, etc.), and rewrites argc/argv
     std::ifstream infile(filename);
     std::cout << "Demo program associated with preprint hep-ph.... managed by Jim John (jim.john@ifj.edu.pl) and Ananya Tapadar (ananya.tapadar@ifj.edu.pl)."<<std::endl;
     std::cout << "It is on how to use polarimetric vectors and helicity-like quantities from HepMC3 file filled in by KKMCee "<< std::endl;
