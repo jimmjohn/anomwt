@@ -151,127 +151,36 @@ void AnomWt::compute() {
       }
   }
 
-  //// New add by AT
-  //// Helicity approximated weight calulation
-  //double wtw[2][2] = {0.0};
-  //m_spinWeight_approx= 0.0;
-  //for (int m=0; m<2; ++m) {
-  //    for (int n=0; n<2; ++n) {
-  //        double sign_m = (m == 0) ? -1 : 1;
-  //        double sign_n = (n == 0) ? -1 : 1;
-  //        double term1 = H1[3] - sign_m * H1[2];
-  //        double term2 = (R0[3][3] - sign_n * R0[3][2] + sign_m * R0[2][3] - sign_m * sign_n * R0[2][2])/R0[3][3];
-  //        double term3 = H2[3] + sign_n * H2[2];
-  //        wtw[m][n] = term1 * term2 * term3;
-  //        m_spinWeight_approx += wtw[m][n];
-  //    }
-  //}
-  //m_spinWeight_approx /= 4.0;  // average over 4 combinations
-
-  //// normalize to make probabilities
-  //double wts = wtw[0][0] + wtw[0][1] + wtw[1][0] + wtw[1][1];
-  //wtw[0][0]=wtw[0][0]/wts;
-  //wtw[0][1]=wtw[0][0]+wtw[0][1]/wts;
-  //wtw[1][0]=wtw[0][1]+wtw[1][0]/wts;
-  //wtw[1][1]=wtw[1][0]+wtw[1][1]/wts;
-
-  //double rndm = gRandom->Uniform();
-
-  //m_hel1=0, m_hel2=0;
-  //if(rndm<wtw[0][0]){m_hel1=-1; m_hel2=-1;}   //attribute approx helicities. Signs need to be fixed.
-  //else if(rndm<wtw[0][1]){m_hel1=-1; m_hel2= 1;}
-  //else if(rndm<wtw[1][0]){m_hel1= 1; m_hel2=-1;}
-  //else if(rndm<wtw[1][1]){m_hel1= 1; m_hel2= 1;}
-
-   // ------------------------------------------------------------------
-  // New add by AT (clean version, with consistent indexing)
-  // Convention: H[0..2] = spatial (x,y,z), H[3] = time
-  //             R[0..2][*] = spatial rows/cols, R[3][*], R[*][3] = time
-  // ------------------------------------------------------------------
-
-  // Build rotation matrix O (3x3 for spatial part)
-  double alpha = m_theta; // angle you want (e.g. pi/2 - theta)
-  double O[3][3] = {
-      { std::cos(alpha), 0.0, std::sin(alpha)},
-      { 0.0,             1.0, 0.0            },
-      {-std::sin(alpha), 0.0, std::cos(alpha)}
-  };
-
-  // Rotate H1, H2 (spatial components only)
-  std::array<double, 4> H1r = H1;
-  std::array<double, 4> H2r = H2;
-  for (int i = 0; i < 3; ++i) {
-      H1r[i] = 0.0;
-      H2r[i] = 0.0;
-      for (int j = 0; j < 3; ++j) {
-          H1r[i] += O[i][j] * H1[j];
-          H2r[i] += O[i][j] * H2[j];
-      }
-  }
-  // time component unchanged
-  H1r[3] = H1[3];
-  H2r[3] = H2[3];
-
-  // Rotate R (spatial-spatial, spatial-time, time-spatial all consistently)
-  double Rr[4][4];
-  // time-time stays same
-  Rr[3][3] = R[3][3];
-  // spatial-spatial
-  for (int i = 0; i < 3; ++i) {
-      for (int j = 0; j < 3; ++j) {
-          Rr[i][j] = 0.0;
-          for (int k = 0; k < 3; ++k) {
-              for (int l = 0; l < 3; ++l) {
-                  Rr[i][j] += O[i][k] * R[k][l] * O[j][l];
-              }
-          }
-      }
-  }
-  // spatial-time
-  for (int i = 0; i < 3; ++i) {
-      Rr[i][3] = 0.0;
-      Rr[3][i] = 0.0;
-      for (int k = 0; k < 3; ++k) {
-          Rr[i][3] += O[i][k] * R[k][3];   // rotate spatial index
-          Rr[3][i] += R[3][k] * O[i][k];   // rotate spatial index
-      }
-  }
-
-  // --------------------------------------------------------------
-  // Approximate helicity weight: use only components {2 (z-axis), 3 (time)}
-  // --------------------------------------------------------------
-  double wtw[2][2] = { 0.0 };
-  m_spinWeight_approx = 0.0;
-
-  for (int m = 0; m < 2; ++m) {
-      for (int n = 0; n < 2; ++n) {
+  // New add by AT
+  // Helicity approximated weight calulation
+  double wtw[2][2] = {0.0};
+  m_spinWeight_approx= 0.0;
+  for (int m=0; m<2; ++m) {
+      for (int n=0; n<2; ++n) {
           double sign_m = (m == 0) ? -1 : 1;
           double sign_n = (n == 0) ? -1 : 1;
-
-          double term1 = H1r[3] - sign_m * H1r[2];
-          double term2 = (Rr[3][3] - sign_n * Rr[3][2] + sign_m * Rr[2][3]
-              - sign_m * sign_n * Rr[2][2]) / Rr[3][3];
-          double term3 = H2r[3] + sign_n * H2r[2];
-
+          double term1 = H1[3] - sign_m * H1[2];
+          double term2 = (R0[3][3] - sign_n * R0[3][2] + sign_m * R0[2][3] - sign_m * sign_n * R0[2][2])/R0[3][3];
+          double term3 = H2[3] + sign_n * H2[2];
           wtw[m][n] = term1 * term2 * term3;
           m_spinWeight_approx += wtw[m][n];
       }
   }
+  m_spinWeight_approx /= 4.0;  // average over 4 combinations
 
-  m_spinWeight_approx /= 4.0;
-
-  // normalize to probabilities
+  // normalize to make probabilities
   double wts = wtw[0][0] + wtw[0][1] + wtw[1][0] + wtw[1][1];
-  wtw[0][0] = wtw[0][0] / wts;
-  wtw[0][1] = wtw[0][0] + wtw[0][1] / wts;
-  wtw[1][0] = wtw[0][1] + wtw[1][0] / wts;
-  wtw[1][1] = wtw[1][0] + wtw[1][1] / wts;
+  wtw[0][0]=wtw[0][0]/wts;
+  wtw[0][1]=wtw[0][0]+wtw[0][1]/wts;
+  wtw[1][0]=wtw[0][1]+wtw[1][0]/wts;
+  wtw[1][1]=wtw[1][0]+wtw[1][1]/wts;
 
   double rndm = gRandom->Uniform();
-  m_hel1 = 0; m_hel2 = 0;
-  if (rndm < wtw[0][0]) { m_hel1 = -1; m_hel2 = -1; }
-  else if (rndm < wtw[0][1]) { m_hel1 = -1; m_hel2 = 1; }
-  else if (rndm < wtw[1][0]) { m_hel1 = 1; m_hel2 = -1; }
-  else if (rndm < wtw[1][1]) { m_hel1 = 1; m_hel2 = 1; }
+
+  m_hel1=0, m_hel2=0;
+  if(rndm<wtw[0][0]){m_hel1=-1; m_hel2=-1;}   //attribute approx helicities. Signs need to be fixed.
+  else if(rndm<wtw[0][1]){m_hel1=-1; m_hel2= 1;}
+  else if(rndm<wtw[1][0]){m_hel1= 1; m_hel2=-1;}
+  else if(rndm<wtw[1][1]){m_hel1= 1; m_hel2= 1;}
 
 }
