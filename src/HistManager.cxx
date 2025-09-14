@@ -306,7 +306,68 @@ void HistManager::DrawHistograms() {
     c15->Update();
 
 
+    TCanvas* c16 = new TCanvas("c16", "Theta Distribution", 800, 600);
+    theta_dist->SetStats(0);
+    theta_dist->GetXaxis()->SetTitle("#theta (radians)");
+    theta_dist->GetYaxis()->SetTitle("Events");
+    theta_dist->SetTitle("Theta Distribution");
+    theta_dist->GetXaxis()->CenterTitle();
+    theta_dist->GetYaxis()->CenterTitle();
+    theta_dist->SetMarkerStyle(20);
+    theta_dist->SetMarkerSize(0.5);
+    theta_dist->SetMarkerColor(kMagenta);
+    theta_dist->Scale(150.0/theta_dist->Integral()); // Normalize to unit area
+    //theta_dist->GetYaxis()->SetRangeUser(0, theta_dist->GetMaximum()*4.0);
+    function->SetLineColor(kRed);
+    function->SetLineWidth(2);
+    c16->SetGrid();
+    theta_dist->Draw("");
+    function->Draw("same");
+    Rtt->Draw("P same");
+    c16->Update();
 
+    TCanvas* c17 = new TCanvas("c17", "Invariant Mass Distribution", 800, 600);
+    Invariant_dist->SetStats(0);
+    Invariant_dist->GetXaxis()->SetTitle("Invariant Mass (GeV)");
+    Invariant_dist->GetYaxis()->SetTitle("Events");
+    Invariant_dist->SetTitle("Invariant Mass Distribution");
+    Invariant_dist->GetXaxis()->CenterTitle();
+    Invariant_dist->GetYaxis()->CenterTitle();
+    Invariant_dist->SetMarkerStyle(20);
+    Invariant_dist->SetMarkerSize(0.5);
+    Invariant_dist->SetMarkerColor(kMagenta);
+    c17->SetGrid();
+    Invariant_dist->Draw("");
+    c17->Update();
+
+
+    TCanvas* c18 = new TCanvas("c18", "Rtt Distribution", 800, 600);
+    Rtt->SetStats(0);
+    Rtt->GetXaxis()->SetTitle("cos(#theta)");
+    Rtt->GetYaxis()->SetTitle("Events");
+    Rtt->SetTitle("Rtt Distribution");
+    Rtt->GetXaxis()->CenterTitle();
+    Rtt->GetYaxis()->CenterTitle();
+    Rtt->SetMarkerStyle(20);
+    Rtt->SetMarkerSize(0.5);
+    Rtt->SetMarkerColor(kMagenta);
+    c18->SetGrid();
+    Rtt->Draw("AP");
+    c18->Update();
+
+    TCanvas* c19 = new TCanvas("c19", "Tau Z Momenta", 800, 600);
+    tauZMomenta->SetStats(0);
+    tauZMomenta->GetXaxis()->SetTitle("Momentum (GeV)");
+    tauZMomenta->GetYaxis()->SetTitle("Events");
+    tauZMomenta->SetTitle("Tau Z Momenta Distribution");
+    tauZMomenta->GetXaxis()->CenterTitle();
+    tauZMomenta->GetYaxis()->CenterTitle();
+    tauZMomenta->SetMarkerStyle(20);
+    tauZMomenta->SetMarkerSize(0.5);
+    tauZMomenta->SetMarkerColor(kMagenta);
+    c19->SetGrid();
+    tauZMomenta->Draw("");
+    c19->Update();
 
     //ps.Close();
 
@@ -328,7 +389,11 @@ void HistManager::DrawHistograms() {
     c13->Print("output_histos.pdf");
     c14->Print("output_histos.pdf");
     c15->Print("output_histos.pdf");
-    c15->Print("output_histos.pdf]");  // close
+    c16->Print("output_histos.pdf");
+    c17->Print("output_histos.pdf");
+    c18->Print("output_histos.pdf");
+    c19->Print("output_histos.pdf");
+    c19->Print("output_histos.pdf]");  // close
 
 
     c7->SaveAs("soft_photons.png");

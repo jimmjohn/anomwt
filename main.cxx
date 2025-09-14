@@ -16,13 +16,15 @@
 #include "HepMC3/ReaderAscii.h"
 #include "HepMC3/GenEvent.h"
 
+#include "DipoleEERij.h"
+
 
 
 int main(int argc, char** argv) {
     TApplication theApp("App", &argc, argv);  // removes ROOT args like -b, etc.
     const char* filename = theApp.Argv()[1];//argv[1] will not work as TApplication eats ROOT options (like -b, -q, etc.), and rewrites argc/argv
     std::ifstream infile(filename);
-    std::cout << "Demo program associated with preprint hep-ph.... managed by Jim John (jim.john@ifj.edu.pl) and Ananya Tapadar (ananya.tapadar@ifj.edu.pl)."<<std::endl;
+    std::cout << "Demo program associated with preprint 'arXiv:2509.04400 [hep-ph]' managed by Jim John (jim.john@ifj.edu.pl) and Ananya Tapadar (ananya.tapadar@ifj.edu.pl)."<<std::endl;
     std::cout << "It is on how to use polarimetric vectors and helicity-like quantities from HepMC3 file filled in by KKMCee "<< std::endl;
     std::cout << "Version: sept 4 2025 "  << std::endl;
     std::cout << "Algorithm works for any tau decay modes,"<<std::endl;
@@ -39,6 +41,7 @@ int main(int argc, char** argv) {
 
     int nevts = 0; // Event counter
     int printEvts = 0;
+    int countSelected = 0;
 
     //Try reading using HepMC3 Reader
     HepMC3::ReaderAscii reader(filename);
@@ -53,7 +56,9 @@ int main(int argc, char** argv) {
         if (reader.failed()) break;
         // Skip empty lines
 
-        //if(nevts > 1000000) break; // Limit to 100000 events
+        bool selected = true;;
+
+        if(nevts > 1000000) break; // Limit to 100000 events
         evtIn = {};
         if(nevts<printEvts){std::cout<< "\n"<< "Evt number: "<<nevts<<std::endl;}
         if(nevts%1000000==0){std::cout<< "\n"<< "Evt number: "<<nevts<<std::endl;}
@@ -68,6 +73,11 @@ int main(int argc, char** argv) {
         if(evtIn.PIPL[0]==0 || evtIn.PIPM[0]==0) continue; //skip if pi+ or pi- not found
         if(evtIn.heTaum==0 || evtIn.heTaul==0) continue; //skip if helicities not found
         if(evtIn.pvTaum_found==false || evtIn.pvTaul_found==false) continue; //skip if polarimetric vectors not found
+
+
+        histSave->tauZMomenta->Fill(evtIn.P1[3]);
+        histSave->tauZMomenta->Fill(evtIn.P2[3]);
+
 
         //Observables calculation
         Observables obs;
@@ -89,15 +99,20 @@ int main(int argc, char** argv) {
         anomwtCS2.compute();
         anomwtCS3.compute();
 
+
+        //if(!anomwtCS1.selected())std::cout<<"selected: "<<anomwtCS1.selected()<<std::endl;
         if(anomwtCS1.hardSoft()>0.98) {
+        countSelected++;
         histSave->helicity_corr->Fill(evtIn.heTaum, evtIn.heTaul);
         histSave->helicity_corr_standalone->Fill(anomwtCS1.approxHel1(), anomwtCS1.approxHel2());
-        }
         histSave->wt_corr_KT_KA->Fill(evtIn.wt, evtIn.wt_approx);
         histSave->wt_corr_KT_ST->Fill(evtIn.wt, anomwtCS1.wtSPIN0());
         histSave->wt_corr_KT_SA->Fill(evtIn.wt, anomwtCS1.spinApproxWt());
         histSave->wt_corr_KA_SA->Fill(evtIn.wt_approx, anomwtCS1.spinApproxWt());
         histSave->wt_corr_ST_SA->Fill(anomwtCS1.wtSPIN0(), anomwtCS1.spinApproxWt());
+        }
+
+        //std::cout<<"Selected events: "<<countSelected<<" out of "<<nevts<<" events"<< " hardSoft="<<anomwtCS1.hardSoft()<<std::endl;
 
         histSave->hardSoft_Histo->Fill(anomwtCS1.hardSoft());
 
@@ -116,6 +131,9 @@ int main(int argc, char** argv) {
             histSave->h_angle_03->Fill(acc_angle, anomwtCS3.wtME());
             histSave->h_angle3->Fill(acc_angle, anomwtCS3.wtSPIN()/anomwtCS3.wtSPIN0()*anomwtCS3.wtME());
         }
+
+        // wtSPIN0 = anomwtCS1.wtSPIN0()/evtIn.wt*anomwtCS1.wtME();
+        // wtSPIN = anomwtCS1.wtSPIN()/evtIn.wt*anomwtCS1.wtME();
 
         //Mustral Frame
         frameOption=2;
@@ -160,6 +178,24 @@ int main(int argc, char** argv) {
         if(anomwtPB1.hardSoft()>0.98) {
             histSave->mustraal_corr->Fill(evtIn.wt, wtMustraal0);
         }
+
+        if(anomwtCS1.Invariant()>5.2 && anomwtPB1.hardSoft()>0.98 ) histSave->theta_dist->Fill(cos(anomwtCS1.theta()));
+        histSave->Invariant_dist->Fill(anomwtCS1.Invariant());
+
+
+
+    }
+
+    Int_t ba=0;
+
+    for( double costheta = -1.0; costheta<=1; costheta+=0.001 ) {
+        ba++;
+        double energy =5.29;
+        double th = acos(costheta);
+        DipoleEERij dipole_calculator3(0);
+        auto RMat = dipole_calculator3.calculate(energy, th, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0);
+        double Rtt_theory = 500*RMat[3][3];
+        histSave->Rtt->SetPoint(ba, costheta, Rtt_theory);
 
 
     }

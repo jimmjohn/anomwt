@@ -60,7 +60,7 @@ if (HepMC3_FOUND)
   include_directories(${HEPMC3_INCLUDE_DIR})
   set(HEPMC_LIBRARIES ${HEPMC3_LIB})
 else()
-  message(FATAL_ERROR "HepMC3 not found. Set HEPMC_INCLUDE_DIRS and HEPMC_LIBRARIES manually.")
+  message(FATAL_ERROR "HepMC3 not found. Define WITH_HEPMC3 manually.")
 endif()
 
 # Add optimization flag

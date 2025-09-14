@@ -4,6 +4,8 @@
 #include <TH1D.h>
 #include <TH2F.h>
 #include <TMath.h>
+#include <TF1.h>
+#include <TGraph.h>
 
 
 class HistManager {
@@ -32,6 +34,18 @@ public:
     TH2F* p1_frame_corr = new TH2F("p1_frame_corr", "P1 Frame Correlation;wt_KKMCee;wt_StandAlone", 100, 0, 4.0, 100, 0, 4.0);
     TH2F* p2_frame_corr = new TH2F("p2_frame_corr", "P2 Frame Correlation;wt_KKMCee;wt_StandAlone", 100, 0, 4.0, 100, 0, 4.0);
     TH2F* mustraal_corr = new TH2F("mustraal_corr", "Mustraal Correlation;wt_KKMCee;wt_StandAlone", 100, 0, 4.0, 100, 0, 4.0);
+
+    TH1D* theta_dist = new TH1D("theta_dist", "Theta Distribution;#theta;Events", 100, -1.0, 1.0);
+    TH1D* Invariant_dist = new TH1D("Invariant_dist", "Invariant Mass Distribution;Invariant Mass (GeV);Events", 100, 0.0, 6.0);
+
+    TF1* function= new TF1("function", "1 + pow(x,2) + pow((2.0*1.77/10.58),2)*(1-x*x)",-1,1);
+
+    TGraph* Rtt = new TGraph();
+
+    TH1D* tauZMomenta = new TH1D("tauZMomenta", "Tau Z Momenta;Momentum (GeV);Events", 100, -6.0, 6.0);
+
+
+
 
 
     TH1D* ratio_angle1 = nullptr;

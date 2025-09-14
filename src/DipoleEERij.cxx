@@ -22,23 +22,10 @@ std::array<std::array<double,4>,4> DipoleEERij::calculate(
     double gam = energy / mtau_;
     double m = mtau_;
 
-    if(iqed_>=5) {
+    if(iqed_<=5) {
         v0_ = 0.0;
         a0_ = 0.0;
     }
-
-    // QED loop corrections (optional)
-    double ArQED = 0.0, AiQED = 0.0;
-    if (iqed_==10) {
-        ArQED = -alpha_ * m * m / (pi_ * V * 4.0 * energy * energy) * log((1 + V) / (1 - V));
-        AiQED = alpha_ * m * m / (V * 4.0 * energy * energy);
-    }
-
-    double ReA1 = ArQED + ReA;
-    double ImA1 = AiQED + ImA;
-
-    // std::cout<< "ReA1 = " << ReA1 << ", ImA1 = " << ImA1 << std::endl;
-    // std::cout<< "ArQED = " << ArQED << ", AiQED = " << AiQED << std::endl;
 
     double s = 4.0 * energy * energy;
     double cth = cos(theta);
@@ -46,7 +33,18 @@ std::array<std::array<double,4>,4> DipoleEERij::calculate(
     double s2th = sin(2.0 * theta);
     double c2th = cos(2.0 * theta);
 
+    // QED loop corrections (optional)
+    double ArQED = 0.0, AiQED = 0.0;
+    if (iqed_==10) {
+        ArQED = -alpha_ * m * m / (pi_ * V * s) * log((1 + V) / (1 - V));
+        AiQED = alpha_ * m * m / (V * s);
+    }
 
+    double ReA1 = ArQED + ReA;
+    double ImA1 = AiQED + ImA;
+
+    // std::cout<< "ReA1 = " << ReA1 << ", ImA1 = " << ImA1 << std::endl;
+    // std::cout<< "ArQED = " << ArQED << ", AiQED = " << AiQED << std::endl;
 
     std::array<std::array<double,4>,4> RSM{};
     std::array<std::array<double,4>,4> RDM{};

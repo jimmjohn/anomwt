@@ -12,7 +12,7 @@ namespace KinLib {
 
 /**
  * @brief Replace Fortran bostdq: boost along arbitrary timelike 4-vector
- * @param idir  -1 for lab→rest, +1 for rest→lab
+ * @param idir  1 for lab→rest, -1 for rest→lab
  * @param vv    Timelike 4-vector {px,py,pz,E}
  * @param pp    Input 4-vector
  * @param q     Output boosted 4-vector
@@ -33,11 +33,11 @@ inline void BostDQ(int idir,
 
     double mass = std::sqrt(std::abs(mass2));
     if(idir == -1) {
-        // boost in opposite direction to vv
+        // boost in the direction of vv
         q[0] = (p[1]*v[1] + p[2]*v[2] + p[3]*v[3] + p[0]*v[0]) / mass;
         wsp = (q[0] + p[0]) / (v[0] + mass);
     } else if(idir == 1) {
-        // boost in the direction of vv
+        // boost in the opposite direction to vv
         q[0] = (-p[1]*v[1] - p[2]*v[2] - p[3]*v[3] + p[0]*v[0]) / mass;
         wsp = -(q[0] + p[0]) / (v[0] + mass);
     } else {
