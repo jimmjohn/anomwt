@@ -163,19 +163,19 @@ int main(int argc, char** argv) {
         // }
 
         //if(anomwtCS1.hardSoft()<0.98 && anomwtCS1.hardSoft()>0.2) {
-        if(anomwtCS1.hardSoft()>0.98) {
+        if(anomwtCS1.hardSoft()<0.98) {
             histSave->collins_soper_corr->Fill(evtIn.wt, anomwtCS1.wtSPIN0());
         }
         //if(anomwtPB1.hardSoft()<0.98 && anomwtPB1.hardSoft()>0.2) {
-        if(anomwtPB1.hardSoft()>0.98) {
+        if(anomwtPB1.hardSoft()<0.98) {
             histSave->p1_frame_corr->Fill(evtIn.wt, anomwtPB1.wtSPIN0());
         }
         //if(anomwtPB2.hardSoft()<0.98 && anomwtPB2.hardSoft()>0.2) {
-        if(anomwtPB2.hardSoft()>0.98) {
+        if(anomwtPB2.hardSoft()<0.98) {
             histSave->p2_frame_corr->Fill(evtIn.wt, anomwtPB2.wtSPIN0());
         }
         //if(anomwtPB1.hardSoft()<0.98 && anomwtPB1.hardSoft()>0.2) {
-        if(anomwtPB1.hardSoft()>0.98) {
+        if(anomwtPB1.hardSoft()<0.98) {
             histSave->mustraal_corr->Fill(evtIn.wt, wtMustraal0);
         }
 

@@ -10,16 +10,77 @@ void AnomWt::compute() {
   }
 
   //m_theta = std::acos(-P1[3]/std::sqrt(P1[1]*P1[1] + P1[2]*P1[2] + P1[3]*P1[3]));
+  double PB11[4]={0,0,0,0};
+  double PB12[4]={0,0,0,0};
+  double PB21[4]={0,0,0,0};
+  double PB22[4]={0,0,0,0};
 
   //Reconstruction of the beam directions
-  PB1[3] = 1.0; //e- along z direction
-  PB2[3] = -1.0; //e+ along -z direction
-  PB1[0] = 1.0;
-  PB2[0] = 1.0;
+  switch(frameOption){
+      case 1:
+          PB11[3] = beamEnergy/2.0; //e- along z direction
+          //PB2[3] = -1.0; //e+ along -z direction
+          PB12[1] = QQ[1] - PB11[1];
+          PB12[2] = QQ[2] - PB11[2];
+          PB12[3] = QQ[3] - PB11[3];
+          PB11[0] = beamEnergy/2.0;
+          PB12[0] = beamEnergy/2.0 - QQ[0];
+
+          PB22[3] = -beamEnergy/2.0; //e along z direction
+          //PB2[3] = -1.0; //e+ along -z direction
+          PB21[1] = QQ[1] - PB22[1];
+          PB21[2] = QQ[2] - PB22[2];
+          PB21[3] = QQ[3] - PB22[3];
+          PB21[0] = beamEnergy/2.0 - QQ[0];
+          PB22[0] = beamEnergy/2.0;
+
+          PB1[1] = (PB11[1]+PB21[1])/2.0;
+          PB1[2] = (PB11[2]+PB21[2])/2.0;
+          PB1[3] = (PB11[3]+PB21[3])/2.0;
+          PB2[1] = (PB12[1]+PB22[1])/2.0;
+          PB2[2] = (PB12[2]+PB22[2])/2.0;
+          PB2[3] = (PB12[3]+PB22[3])/2.0;
+          PB1[0] = (PB11[0]+PB21[0])/2.0;
+          PB2[0] = (PB12[0]+PB22[0])/2.0;
+        //   PB1[3] = beamEnergy/2.0; //e- along z direction
+        //   //PB2[3] = -1.0; //e+ along -z direction
+        //   PB2[1] = QQ[1] - PB1[1];
+        //   PB2[2] = QQ[2] - PB1[2];
+        //   PB2[3] = QQ[3] - PB1[3];
+        //   PB1[0] = beamEnergy/2.0;
+        //   PB2[0] = beamEnergy/2.0 - QQ[0];
+          break;
+      case 2:
+          PB1[3] = beamEnergy/2.0; //e- along z direction
+          //PB2[3] = -1.0; //e+ along -z direction
+          PB2[1] = QQ[1] - PB1[1];
+          PB2[2] = QQ[2] - PB1[2];
+          PB2[3] = QQ[3] - PB1[3];
+          PB1[0] = beamEnergy/2.0;
+          PB2[0] = beamEnergy/2.0 - QQ[0];
+          break;
+      case 3:
+          PB2[3] = beamEnergy/2.0; //e- along z direction
+          //PB2[3] = -1.0; //e+ along -z direction
+          PB1[1] = QQ[1] - PB2[1];
+          PB1[2] = QQ[2] - PB2[2];
+          PB1[3] = QQ[3] - PB2[3];
+          PB1[0] = beamEnergy/2.0 - QQ[0];
+          PB2[0] = beamEnergy/2.0;
+          break;
+  }
 
   for(auto& arr : { &H1, &H2, &P1, &P2, &PB1, &PB2}) {
       KinLib::BostDQ(1, QQ, *arr, *arr);
   }
+
+//   std::cout<<"nevts="<<nevts<<std::endl;
+//   std::cout<<"P1="<<P1[0]<<" "<<P1[1]<<" "<<P1[2]<<" "<<P1[3]<<std::endl;
+//   std::cout<<"P2="<<P2[0]<<" "<<P2[1]<<" "<<P2[2]<<" "<<P2[3]<<std::endl;
+//   std::cout<<"PB1="<<PB1[0]<<" "<<PB1[1]<<" "<<PB1[2]<<" "<<PB1[3]<<std::endl;
+//   std::cout<<"PB2="<<PB2[0]<<" "<<PB2[1]<<" "<<PB2[2]<<" "<<PB2[3]<<std::endl;
+//   std::cout<<"H1="<<H1[0]<<" "<<H1[1]<<" "<<H1[2]<<" "<<H1[3]<<std::endl;
+//   std::cout<<"H2="<<H2[0]<<" "<<H2[1]<<" "<<H2[2]<<" "<<H2[3]<<std::endl;
 
   // 5) Rotate about z to eliminate y‐components of P2
   double fi;
@@ -44,6 +105,14 @@ void AnomWt::compute() {
   for(auto& arr : { &H1, &H2, &P1, &P2, &PB1, &PB2}) {
       KinLib::ROTOD2(-thet, *arr, *arr);
   }
+
+//   std::cout<<"Align taus along z"<<std::endl;
+//   std::cout<<"P1="<<P1[0]<<" "<<P1[1]<<" "<<P1[2]<<" "<<P1[3]<<std::endl;
+//   std::cout<<"P2="<<P2[0]<<" "<<P2[1]<<" "<<P2[2]<<" "<<P2[3]<<std::endl;
+//   std::cout<<"PB1="<<PB1[0]<<" "<<PB1[1]<<" "<<PB1[2]<<" "<<PB1[3]<<std::endl;
+//   std::cout<<"PB2="<<PB2[0]<<" "<<PB2[1]<<" "<<PB2[2]<<" "<<PB2[3]<<std::endl;
+//   std::cout<<"H1="<<H1[0]<<" "<<H1[1]<<" "<<H1[2]<<" "<<H1[3]<<std::endl;
+//   std::cout<<"H2="<<H2[0]<<" "<<H2[1]<<" "<<H2[2]<<" "<<H2[3]<<std::endl;
 
   // 7) Align beam‐difference to x–z plane
   switch(frameOption){
