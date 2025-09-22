@@ -55,6 +55,9 @@ public:
     double Rtt()         const { return Rtt_val; }
     double tauMomentum() const { return m_tauMomentum; }
     double tauEnergy()   const { return m_tauEnergy; }
+    double directThetaVal() const { return directTheta; }
+    double TransverseMomentum() const { return m_transverseMomentum; }
+    double taumomentaz() const { return m_tau_momentum_z; }  // added
 
     // If you prefer public fields, you can expose these directly instead of getters.
 
@@ -78,6 +81,9 @@ private:
     double Rtt_val{0.0};
     double m_tauMomentum{0.0};
     double m_tauEnergy{0.0};
+    double directTheta{0.0}; // for debugging
+    double m_transverseMomentum{0.0};
+    double m_tau_momentum_z{0.0};  // added
 
     // Build a right-handed beam basis: z_b = PB1, x_b = (PBB ⟂ z_b), y_b = z_b × x_b
     static inline TRotation BuildBeamRotation(const TVector3& pb1, const TVector3& pbb)

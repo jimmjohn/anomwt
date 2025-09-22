@@ -22,7 +22,7 @@ std::array<std::array<double,4>,4> DipoleEERij::calculate(
     double gam = energy / mtau_;
     double m = mtau_;
 
-    if(iqed_<=5) {
+    if(iqed_>=5) {
         v0_ = 0.0;
         a0_ = 0.0;
     }

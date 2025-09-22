@@ -1,4 +1,5 @@
 #include "AnomWt.h"
+#include "PhysicsConstants.h"
 
 void AnomWt::compute() {
   // 3) Build the tau‐pair rest frame
@@ -9,87 +10,23 @@ void AnomWt::compute() {
       PB1[k] = PB2[k] = 0.0;
   }
 
-  //m_theta = std::acos(-P1[3]/std::sqrt(P1[1]*P1[1] + P1[2]*P1[2] + P1[3]*P1[3]));
-  double PB11[4]={0,0,0,0};
-  double PB12[4]={0,0,0,0};
-  double PB21[4]={0,0,0,0};
-  double PB22[4]={0,0,0,0};
-
-  //Reconstruction of the beam directions
-  switch(frameOption){
-      case 1:
-          PB11[3] = beamEnergy/2.0; //e- along z direction
-          //PB2[3] = -1.0; //e+ along -z direction
-          PB12[1] = QQ[1] - PB11[1];
-          PB12[2] = QQ[2] - PB11[2];
-          PB12[3] = QQ[3] - PB11[3];
-          PB11[0] = beamEnergy/2.0;
-          PB12[0] = beamEnergy/2.0 - QQ[0];
-
-          PB22[3] = -beamEnergy/2.0; //e along z direction
-          //PB2[3] = -1.0; //e+ along -z direction
-          PB21[1] = QQ[1] - PB22[1];
-          PB21[2] = QQ[2] - PB22[2];
-          PB21[3] = QQ[3] - PB22[3];
-          PB21[0] = beamEnergy/2.0 - QQ[0];
-          PB22[0] = beamEnergy/2.0;
-
-          PB1[1] = (PB11[1]+PB21[1])/2.0;
-          PB1[2] = (PB11[2]+PB21[2])/2.0;
-          PB1[3] = (PB11[3]+PB21[3])/2.0;
-          PB2[1] = (PB12[1]+PB22[1])/2.0;
-          PB2[2] = (PB12[2]+PB22[2])/2.0;
-          PB2[3] = (PB12[3]+PB22[3])/2.0;
-          PB1[0] = (PB11[0]+PB21[0])/2.0;
-          PB2[0] = (PB12[0]+PB22[0])/2.0;
-        //   PB1[3] = beamEnergy/2.0; //e- along z direction
-        //   //PB2[3] = -1.0; //e+ along -z direction
-        //   PB2[1] = QQ[1] - PB1[1];
-        //   PB2[2] = QQ[2] - PB1[2];
-        //   PB2[3] = QQ[3] - PB1[3];
-        //   PB1[0] = beamEnergy/2.0;
-        //   PB2[0] = beamEnergy/2.0 - QQ[0];
-          break;
-      case 2:
-          PB1[3] = beamEnergy/2.0; //e- along z direction
-          //PB2[3] = -1.0; //e+ along -z direction
-          PB2[1] = QQ[1] - PB1[1];
-          PB2[2] = QQ[2] - PB1[2];
-          PB2[3] = QQ[3] - PB1[3];
-          PB1[0] = beamEnergy/2.0;
-          PB2[0] = beamEnergy/2.0 - QQ[0];
-          break;
-      case 3:
-          PB2[3] = beamEnergy/2.0; //e- along z direction
-          //PB2[3] = -1.0; //e+ along -z direction
-          PB1[1] = QQ[1] - PB2[1];
-          PB1[2] = QQ[2] - PB2[2];
-          PB1[3] = QQ[3] - PB2[3];
-          PB1[0] = beamEnergy/2.0 - QQ[0];
-          PB2[0] = beamEnergy/2.0;
-          break;
-  }
+  PB1[3] = beamEnergy/2.0; PB2[3] = -beamEnergy/2.0;
+  PB1[0] = PB2[0] = beamEnergy/2.0;
+  double initial_theta = std:: acos(P1[3]/(std::sqrt(P1[1]*P1[1] + P2[2]*P2[2] + P2[3]*P2[3])));
+  m_tau_momentum_z = P1[3];
+  m_transverseMomentum = sqrt(pow((P1[1] + P2[1]), 2.) + pow((P1[2] + P2[2]), 2.));
 
   for(auto& arr : { &H1, &H2, &P1, &P2, &PB1, &PB2}) {
       KinLib::BostDQ(1, QQ, *arr, *arr);
   }
+  //Invarian mass of tau pair system (s^\prime = (pbeam1 + pbeam2 - k)**2)
+  E = sqrt(pow((P1[0] + P2[0]), 2.) - pow((P1[1] + P2[1]), 2.) - pow((P1[2] + P2[2]), 2.) - pow((P1[3] + P2[3]), 2.)) / 2.0;   //Since we are adding the photon
 
-//   std::cout<<"nevts="<<nevts<<std::endl;
-//   std::cout<<"P1="<<P1[0]<<" "<<P1[1]<<" "<<P1[2]<<" "<<P1[3]<<std::endl;
-//   std::cout<<"P2="<<P2[0]<<" "<<P2[1]<<" "<<P2[2]<<" "<<P2[3]<<std::endl;
-//   std::cout<<"PB1="<<PB1[0]<<" "<<PB1[1]<<" "<<PB1[2]<<" "<<PB1[3]<<std::endl;
-//   std::cout<<"PB2="<<PB2[0]<<" "<<PB2[1]<<" "<<PB2[2]<<" "<<PB2[3]<<std::endl;
-//   std::cout<<"H1="<<H1[0]<<" "<<H1[1]<<" "<<H1[2]<<" "<<H1[3]<<std::endl;
-//   std::cout<<"H2="<<H2[0]<<" "<<H2[1]<<" "<<H2[2]<<" "<<H2[3]<<std::endl;
 
   // 5) Rotate about z to eliminate y‐components of P2
   double fi;
   double randSave = gRandom->Uniform();
-  if(randSave < 1.0) {
-      fi = KinLib::ANGFI(P2[1], P2[2]);
-  } else {
-      fi = KinLib::ANGFI(P1[1], P1[2]);
-  }
+  fi = KinLib::ANGFI(P1[1], P1[2]);
   for(auto& arr : { &H1, &H2, &P1, &P2, &PB1, &PB2}) {
       KinLib::ROTOD3(-fi, *arr, *arr);
   }
@@ -97,27 +34,17 @@ void AnomWt::compute() {
   // 6) Rotate about y to align taus along z
   //double thet = std::acos(-PB1[3]/std::sqrt(PB1[1]*PB1[1] + PB1[2]*PB1[2] + PB1[3]*PB1[3]));
   double thet;
-  if(randSave < 1.0) {
-      thet = KinLib::ANGXY(P2[3], P2[1]);
-  } else {
-      thet = KinLib::ANGXY(P1[3], P1[1]);
-  }
+  thet = KinLib::ANGXY(P1[3], P1[1]);
   for(auto& arr : { &H1, &H2, &P1, &P2, &PB1, &PB2}) {
       KinLib::ROTOD2(-thet, *arr, *arr);
   }
 
-//   std::cout<<"Align taus along z"<<std::endl;
-//   std::cout<<"P1="<<P1[0]<<" "<<P1[1]<<" "<<P1[2]<<" "<<P1[3]<<std::endl;
-//   std::cout<<"P2="<<P2[0]<<" "<<P2[1]<<" "<<P2[2]<<" "<<P2[3]<<std::endl;
-//   std::cout<<"PB1="<<PB1[0]<<" "<<PB1[1]<<" "<<PB1[2]<<" "<<PB1[3]<<std::endl;
-//   std::cout<<"PB2="<<PB2[0]<<" "<<PB2[1]<<" "<<PB2[2]<<" "<<PB2[3]<<std::endl;
-//   std::cout<<"H1="<<H1[0]<<" "<<H1[1]<<" "<<H1[2]<<" "<<H1[3]<<std::endl;
-//   std::cout<<"H2="<<H2[0]<<" "<<H2[1]<<" "<<H2[2]<<" "<<H2[3]<<std::endl;
+  double thetataupair = std::acos(PB1[3]/(std::sqrt(PB1[1]*PB1[1] + PB1[2]*PB1[2] +PB1[3]*PB1[3])));
 
   // 7) Align beam‐difference to x–z plane
   switch(frameOption){
       case 1:
-          for(int k=0; k<4; ++k) PBB[k] = PB2[k] - PB1[k];//Collins-Soper frame
+          for(int k=0; k<4; ++k) PBB[k] = PB1[k] - PB2[k];//Collins-Soper frame
           break;
       case 2:
           for(int k=0; k<4; ++k) PBB[k] = PB1[k];
@@ -127,7 +54,8 @@ void AnomWt::compute() {
           break;
   }
 
-  double fi1 = KinLib::ANGFI(PBB[1], PBB[2]);
+  //double fi1 = KinLib::ANGFI(PBB[1], PBB[2]);
+  double fi1 = KinLib::ANGXY(PBB[1], PBB[2]);     //Modified by AT, 21.09.2025
   for(auto& arr : { &H1, &H2, &P1, &P2, &PB1, &PB2}) {
               KinLib::ROTOD3(-fi1, *arr, *arr);
   }
@@ -138,19 +66,25 @@ void AnomWt::compute() {
   TVector3 p2(P2[1],P2[2],P2[3]);
   TVector3 pb1(PB1[1],PB1[2],PB1[3]);
   TVector3 pb2(PB2[1],PB2[2],PB2[3]);
-  double theta1 =  p1.Unit().Angle(pb1.Unit());
-  double theta2 =  p2.Unit().Angle(pb2.Unit());
-  double T1 = PB1[0]*PB1[0]*(1.0+cos(theta1)*cos(theta1));
-  double T2 = PB2[0]*PB2[0]*(1.0+cos(theta2)*cos(theta2));
+  double theta1 =  acos(PB1[3] /std::sqrt(PB1[1] * PB1[1] + PB1[2] * PB1[2] + PB1[3] * PB1[3]));
+  double theta2 =  acos(-PB2[3] /std::sqrt(PB2[1] * PB2[1] + PB2[2] * PB2[2] + PB2[3] * PB2[3]));
+  // Calculation of Asymmetry factor fromm theory
+  DipoleEERij probablity_calc(0);
+  auto Rtt1 = probablity_calc.calculate(E, acos(0.5), 0., 0., 0., 0., 0., 0., 0., 0.);
+  auto Rtt2 = probablity_calc.calculate(E, acos(-0.5), 0., 0., 0., 0., 0., 0., 0., 0.);
+  double A = 0* (5.0/2.0)*(Rtt1[3][3]-Rtt2[3][3])/(Rtt1[3][3]+Rtt2[3][3]);
+  // New probabilities to Mustraal is added by Z. Was ---> inroduction of mass term effect and FBasymmetry.
+  double T1 = PB1[0] * PB1[0] * (1.0 + cos(theta1) * cos(theta1)+ pow(Physics::m_tau,2)/(P1[0]*P1[0])*sin(theta1)*sin(theta1)+ A*cos(theta1));
+  double T2 = PB2[0] * PB2[0] * (1.0 + cos(theta2) * cos(theta2)+ pow(Physics::m_tau,2)/(P1[0]*P1[0])*sin(theta2)*sin(theta2)+ A*cos(theta2));
   switch(frameOption){
       case 1:
           m_prob = 1.0;
           break;
       case 2:
-          m_prob = T1/(T1+T2);
+          m_prob = T1 / (T1 + T2);
           break;
       case 3:
-          m_prob = T2/(T1+T2);
+          m_prob = T2 / (T1 + T2);
           break;
   }
 
@@ -158,7 +92,7 @@ void AnomWt::compute() {
   //Finding Hard Photons
   std::array<double,4> TR;
   for(int k=0; k<4; ++k) TR[k] = P1[k]+P2[k];
-  m_hardSoft =(TR[0]*TR[0])/(beamEnergy*beamEnergy);
+  m_hardSoft =(beamEnergy * beamEnergy - TR[0]*TR[0])/(beamEnergy*beamEnergy);
 
   // 8) Final boosts of polarimeters and pions to tau rest frame
   for(auto& arr : { &H1}) {
@@ -175,18 +109,16 @@ void AnomWt::compute() {
   TVector3 Fpb1(PB1[1],PB1[2],PB1[3]);
   TVector3 Fpb2(PB2[1],PB2[2],PB2[3]);
 
-  E=sqrt(pow((P1[0]+P2[0]),2.)-pow((P1[1]+P2[1]),2.)-pow((P1[2]+P2[2]),2.)-pow((P1[3]+P2[3]),2.))/2.0;
   // 10) Compute angle with respect to tau-/z axis & prepare R0,R matrices
   switch(frameOption){
       case 1:
-          //m_theta = Fp1.Unit().Angle(Fpb1.Unit());
-          m_theta = std::acos(-PB1[3]/std::sqrt(PB1[1]*PB1[1] + PB1[2]*PB1[2] + PB1[3]*PB1[3]));
+          m_theta = std::acos(PB1[3] /std::sqrt(PB1[1]*PB1[1] + PB1[2]*PB1[2] + PB1[3]*PB1[3]));
           break;
       case 2:
           m_theta = std::acos(PB1[3]/std::sqrt(PB1[1]*PB1[1] + PB1[2]*PB1[2] + PB1[3]*PB1[3]));
           break;
       case 3:
-          m_theta = std::acos(PB2[3]/std::sqrt(PB2[1]*PB2[1] + PB2[2]*PB2[2] + PB2[3]*PB2[3]));
+          m_theta = std::acos(-PB2[3]/std::sqrt(PB2[1]*PB2[1] + PB2[2]*PB2[2] + PB2[3]*PB2[3]));
           break;
   }
 

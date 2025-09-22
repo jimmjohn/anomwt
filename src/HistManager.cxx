@@ -8,12 +8,13 @@
 #include <TPostScript.h>
 #include <TLatex.h>
 #include <TLine.h>
+#include <TString.h>
 
 
 HistManager::~HistManager() {
 }
 
-void HistManager::DrawHistograms() {
+void HistManager::DrawHistograms(double beamEnergy, double avg_m2OverE2) {
     TDirectory* currentDir = gDirectory;
 
     // Create a new directory for the histograms
@@ -27,7 +28,8 @@ void HistManager::DrawHistograms() {
     helicity_corr->SetStats(0);
     helicity_corr->GetXaxis()->SetTitle("Helicity of #tau^{-}");
     helicity_corr->GetYaxis()->SetTitle("Helicity of #tau^{+}");
-    helicity_corr->SetTitle("Helicity Correlation at 10 GeV with spin weight");
+    TString title1 = Form("Helicity Correlation at %.2f GeV from KKMCee", beamEnergy);
+    helicity_corr->SetTitle(title1);
     helicity_corr->GetXaxis()->CenterTitle();
     helicity_corr->GetYaxis()->CenterTitle();
     helicity_corr->SetMarkerStyle(20);
@@ -36,42 +38,54 @@ void HistManager::DrawHistograms() {
     helicity_corr->Draw("COLZ TEXT");
     c1->Update();
 
+    TCanvas* c2 = new TCanvas("c2", "Helicity Correlation_Standalone", 800, 600);
+    helicity_corr_standalone->SetStats(0);
+    helicity_corr_standalone->GetXaxis()->CenterTitle();
+    helicity_corr_standalone->GetYaxis()->CenterTitle();
+    helicity_corr_standalone->SetMarkerStyle(20);
+    helicity_corr_standalone->SetMarkerColor(kBlack);
+    c2->SetGrid();
+    helicity_corr_standalone->Draw("COLZ TEXT");
+    c2->Update();
+
     //ps.NewPage();
-    TCanvas* c2 = new TCanvas("c2", "WT Correlation", 800, 600);
+    TCanvas* c3 = new TCanvas("c3", "WT Correlation", 800, 600);
     wt_corr_KT_KA->SetStats(0);
     wt_corr_KT_KA->GetXaxis()->SetTitle("SpinWT");
     wt_corr_KT_KA->GetYaxis()->SetTitle("SpinWThelApprox");
-    wt_corr_KT_KA->SetTitle("SpinWT Correlation at 10.58 GeV without spin weight");
+    TString title3 = Form("SpinWT Correlation at %.2f GeV from KKMCee", beamEnergy);
+    wt_corr_KT_KA->SetTitle(title3);
     wt_corr_KT_KA->GetXaxis()->CenterTitle();
     wt_corr_KT_KA->GetYaxis()->CenterTitle();
     wt_corr_KT_KA->SetMarkerStyle(20);
     wt_corr_KT_KA->SetMarkerSize(0.5);
     wt_corr_KT_KA->SetMarkerColor(kBlue);
-    c2->SetGrid();
+    c3->SetGrid();
     wt_corr_KT_KA->Draw("COLZ");
     TLatex tex;
     tex.SetTextSize(0.04);
     tex.DrawLatexNDC(0.15, 0.8, Form("Correlation Factor: %.2f", wt_corr_KT_KA->GetCorrelationFactor()));
-    c2->Update();
+    c3->Update();
 
     //ps.NewPage();
     // Draw acoplanarity angle
-    TCanvas* c3 = new TCanvas("c3", "Acoplanarity Angle", 800, 600);
+    TCanvas* c4 = new TCanvas("c4", "Acoplanarity Angle", 800, 600);
     acoplanarity_angle1->SetStats(0);
     acoplanarity_angle1->GetXaxis()->SetTitle("Acoplanarity Angle (degrees)");
     acoplanarity_angle1->GetYaxis()->SetTitle("Spin Weight");
-    acoplanarity_angle1->SetTitle("Acoplanarity Angle vs Spin Weight at 10 GeV with spin weight");
+    TString title4 = Form("Acoplanarity Angle vs Spin Weight at %.2f GeV with spin weight", beamEnergy);
+    acoplanarity_angle1->SetTitle(title4);
     acoplanarity_angle1->GetXaxis()->CenterTitle();
     acoplanarity_angle1->GetYaxis()->CenterTitle();
     acoplanarity_angle1->SetMarkerStyle(20);
     acoplanarity_angle1->SetMarkerSize(0.5);
     acoplanarity_angle1->SetMarkerColor(kRed);
-    c3->SetGrid();
+    c4->SetGrid();
     acoplanarity_angle1->Draw("COLZ");
-    c3->Update();
+    c4->Update();
 
     //ps.NewPage();
-    TCanvas* c4 = new TCanvas("c4", "Acoplanarity Angle 0 vs Spin Weight", 800, 600);
+    TCanvas* c5 = new TCanvas("c5", "Acoplanarity Angle 0 vs Spin Weight", 800, 600);
     // h_angle_0->SetStats(0);
     // h_angle_0->GetXaxis()->SetTitle("Acoplanarity Angle (degrees)");
     // h_angle_0->GetYaxis()->SetTitle("Events");
@@ -83,10 +97,10 @@ void HistManager::DrawHistograms() {
     h_angle_01->SetMarkerColor(kBlue);
     c4->SetGrid();
     h_angle_01->Draw("E1");
-    c4->Update();
+    c5->Update();
 
     //ps.NewPage();
-    TCanvas* c5 = new TCanvas("c5", "Acoplanarity Angle vs Spin Weight", 800, 600);
+    TCanvas* c6 = new TCanvas("c6", "Acoplanarity Angle vs Spin Weight", 800, 600);
     //h_angle->SetStats(0);
     //h_angle->GetXaxis()->SetTitle("Acoplanarity Angle (degrees)");
     //h_angle->GetYaxis()->SetTitle("Events");
@@ -96,14 +110,14 @@ void HistManager::DrawHistograms() {
     h_angle1->SetMarkerStyle(20);
     h_angle1->SetMarkerSize(0.5);
     h_angle1->SetMarkerColor(kRed);
-    c5->SetGrid();
+    c6->SetGrid();
     h_angle1->Draw("E1");
-    c5->Update();
+    c6->Update();
 
     //ps.NewPage();
-    TCanvas* c6 = new TCanvas("c6", "Ratio of Acoplanarity Angles", 1200, 600);
-    c6->Divide(3,1);
-    c6->cd(1);
+    TCanvas* c7 = new TCanvas("c7", "Ratio of Acoplanarity Angles", 1200, 600);
+    c7->Divide(3,1);
+    c7->cd(1);
     ratio_angle1->SetStats(0);
     //ratio_angle->GetXaxis()->SetTitle("Acoplanarity Angle (degrees)");
     ratio_angle1->GetXaxis()->SetTitle("#phi (radians)");
@@ -138,7 +152,7 @@ void HistManager::DrawHistograms() {
     y1->Draw("same");
     gPad->Update(); // Update the pad to reflect the new axis
 
-    c6->cd(2);
+    c7->cd(2);
     ratio_angle2->SetStats(0);
     //ratio_angle->GetXaxis()->SetTitle("Acoplanarity Angle (degrees)");
     ratio_angle2->GetXaxis()->SetTitle("#phi (radians)");
@@ -167,7 +181,7 @@ void HistManager::DrawHistograms() {
     gPad->Update(); // Update the pad to reflect the new axis
 
 
-    c6->cd(3);
+    c7->cd(3);
     ratio_angle3->SetStats(0);
     //ratio_angle->GetXaxis()->SetTitle("Acoplanarity Angle (degrees)");
     ratio_angle3->GetXaxis()->SetTitle("#phi (radians)");
@@ -194,139 +208,188 @@ void HistManager::DrawHistograms() {
     ratio_angle3->Draw("HIST");
     y1->Draw("same");
     gPad->Update(); // Update the pad to reflect the new axis
-    c6->Update();
-
-    //ps.NewPage();
-    TCanvas* c7 = new TCanvas("c7","weight_correlations",1200,1200);
-    c7->Divide(2,2);
-    c7->cd(1);
-    collins_soper_corr->Draw("colz");
-    c7->cd(2);
-    p1_frame_corr->Draw("colz");
-    c7->cd(3);
-    p2_frame_corr->Draw("colz");
-    c7->cd(4);
-    mustraal_corr->Draw("colz");
     c7->Update();
 
     //ps.NewPage();
-    TCanvas* c8 = new TCanvas("c8", "hardSoft" ,800,600);
-    c8->cd();
-    hardSoft_Histo->Draw();
+    TCanvas* c8 = new TCanvas("c8","weight_correlations soft photon case",1200,1200);
+    c8->Divide(2,2);
+    c8->cd(1);
+    collins_soper_corr_soft->Draw("colz");
+    c8->cd(2);
+    p1_frame_corr_soft->Draw("colz");
+    c8->cd(3);
+    p2_frame_corr_soft->Draw("colz");
+    c8->cd(4);
+    mustraal_corr_soft->Draw("colz");
     c8->Update();
 
-    //ps.NewPage();
-    TCanvas* c9 = new TCanvas("c9", "collins_by_mustraal" ,800,600);
-    c9->cd();
-    collins_by_mustraal->SetTitle("collins_by_mustraal");
-    collins_by_mustraal->GetZaxis()->SetRangeUser(0,2.);
-    collins_by_mustraal->Draw("colz");
+    TCanvas* c9 = new TCanvas("c9","weight_correlations hard photon case",1200,1200);
+    c9->Divide(2,2);
+    c9->cd(1);
+    collins_soper_corr_hard->Draw("colz");
+    c9->cd(2);
+    p1_frame_corr_hard->Draw("colz");
+    c9->cd(3);
+    p2_frame_corr_hard->Draw("colz");
+    c9->cd(4);
+    mustraal_corr_hard->Draw("colz");
     c9->Update();
 
 
-    TCanvas* c10 = new TCanvas("c10", "Helicity Correlation_Standalone", 800, 600);
-    helicity_corr_standalone->SetStats(0);
-    helicity_corr_standalone->GetXaxis()->CenterTitle();
-    helicity_corr_standalone->GetYaxis()->CenterTitle();
-    helicity_corr_standalone->SetMarkerStyle(20);
-    helicity_corr_standalone->SetMarkerColor(kBlack);
-    c10->SetGrid();
-    helicity_corr_standalone->Draw("COLZ TEXT");
+    //ps.NewPage();
+    TCanvas* c10 = new TCanvas("c10", "hardSoft" ,800,600);
+    c10->cd();
+    hardSoft_Histo->Draw();
     c10->Update();
 
     //ps.NewPage();
-    TCanvas* c11 = new TCanvas("c11", "WT Correlation KT KA", 800, 600);
+    TCanvas* c11 = new TCanvas("c11", "collins_by_mustraal" ,800,600);
+    c11->cd();
+    collins_by_mustraal->SetTitle("collins_by_mustraal");
+    collins_by_mustraal->GetZaxis()->SetRangeUser(0,2.);
+    collins_by_mustraal->Draw("colz");
+    c11->Update();
+
+    //ps.NewPage();
+    TCanvas* c12 = new TCanvas("c12", "WT Correlation KT KA", 800, 600);
     wt_corr_KT_KA->SetStats(0);
     wt_corr_KT_KA->GetXaxis()->CenterTitle();
     wt_corr_KT_KA->GetYaxis()->CenterTitle();
     wt_corr_KT_KA->SetMarkerStyle(20);
     wt_corr_KT_KA->SetMarkerSize(0.5);
     wt_corr_KT_KA->SetMarkerColor(kBlue);
-    c11->SetGrid();
+    c12->SetGrid();
     wt_corr_KT_KA->Draw("COLZ");
     TLatex texx;
     texx.SetTextSize(0.04);
     texx.DrawLatexNDC(0.15, 0.8, Form("Correlation Factor: %.2f", wt_corr_KT_KA->GetCorrelationFactor()));
-    c11->Update();
+    c12->Update();
 
-    TCanvas* c12 = new TCanvas("c12", "WT Correlation KT ST", 800, 600);
+    TCanvas* c13 = new TCanvas("c13", "WT Correlation KT ST", 800, 600);
     wt_corr_KT_ST->SetStats(0);
     wt_corr_KT_ST->GetXaxis()->CenterTitle();
     wt_corr_KT_ST->GetYaxis()->CenterTitle();
     wt_corr_KT_ST->SetMarkerStyle(20);
     wt_corr_KT_ST->SetMarkerSize(0.5);
     wt_corr_KT_ST->SetMarkerColor(kBlue);
-    c12->SetGrid();
+    c13->SetGrid();
     wt_corr_KT_ST->Draw("COLZ");
     TLatex texx2;
     texx2.SetTextSize(0.04);
     texx2.DrawLatexNDC(0.15, 0.8, Form("Correlation Factor: %.2f", wt_corr_KT_ST->GetCorrelationFactor()));
-    c12->Update();
+    c13->Update();
 
-    TCanvas* c13 = new TCanvas("c13", "WT Correlation KT SA", 800, 600);
+    TCanvas* c14 = new TCanvas("c14", "WT Correlation KT SA", 800, 600);
     wt_corr_KT_SA->SetStats(0);
     wt_corr_KT_SA->GetXaxis()->CenterTitle();
     wt_corr_KT_SA->GetYaxis()->CenterTitle();
     wt_corr_KT_SA->SetMarkerStyle(20);
     wt_corr_KT_SA->SetMarkerSize(0.5);
     wt_corr_KT_SA->SetMarkerColor(kBlue);
-    c13->SetGrid();
+    c14->SetGrid();
     wt_corr_KT_SA->Draw("COLZ");
     TLatex texx3;
     texx3.SetTextSize(0.04);
     texx3.DrawLatexNDC(0.15, 0.8, Form("Correlation Factor: %.2f", wt_corr_KT_SA->GetCorrelationFactor()));
-    c13->Update();
+    c14->Update();
 
-    TCanvas* c14 = new TCanvas("c14", "WT Correlation KA SA", 800, 600);
+    TCanvas* c15 = new TCanvas("c15", "WT Correlation KA SA", 800, 600);
     wt_corr_KA_SA->SetStats(0);
     wt_corr_KA_SA->GetXaxis()->CenterTitle();
     wt_corr_KA_SA->GetYaxis()->CenterTitle();
     wt_corr_KA_SA->SetMarkerStyle(20);
     wt_corr_KA_SA->SetMarkerSize(0.5);
     wt_corr_KA_SA->SetMarkerColor(kBlue);
-    c14->SetGrid();
+    c15->SetGrid();
     wt_corr_KA_SA->Draw("COLZ");
     TLatex texx4;
     texx4.SetTextSize(0.04);
     texx4.DrawLatexNDC(0.15, 0.8, Form("Correlation Factor: %.2f", wt_corr_KA_SA->GetCorrelationFactor()));
-    c14->Update();
+    c15->Update();
 
-    TCanvas* c15 = new TCanvas("c15", "WT Correlation KA SA", 800, 600);
+    TCanvas* c16 = new TCanvas("c16", "WT Correlation KA SA", 800, 600);
     wt_corr_ST_SA->SetStats(0);
     wt_corr_ST_SA->GetXaxis()->CenterTitle();
     wt_corr_ST_SA->GetYaxis()->CenterTitle();
     wt_corr_ST_SA->SetMarkerStyle(20);
     wt_corr_ST_SA->SetMarkerSize(0.5);
     wt_corr_ST_SA->SetMarkerColor(kBlue);
-    c15->SetGrid();
+    c16->SetGrid();
     wt_corr_ST_SA->Draw("COLZ");
     TLatex texx5;
     texx5.SetTextSize(0.04);
     texx5.DrawLatexNDC(0.15, 0.8, Form("Correlation Factor: %.2f", wt_corr_ST_SA->GetCorrelationFactor()));
-    c15->Update();
-
-
-    TCanvas* c16 = new TCanvas("c16", "Theta Distribution", 800, 600);
-    theta_dist->SetStats(0);
-    theta_dist->GetXaxis()->SetTitle("#theta (radians)");
-    theta_dist->GetYaxis()->SetTitle("Events");
-    theta_dist->SetTitle("Theta Distribution");
-    theta_dist->GetXaxis()->CenterTitle();
-    theta_dist->GetYaxis()->CenterTitle();
-    theta_dist->SetMarkerStyle(20);
-    theta_dist->SetMarkerSize(0.5);
-    theta_dist->SetMarkerColor(kMagenta);
-    theta_dist->Scale(150.0/theta_dist->Integral()); // Normalize to unit area
-    //theta_dist->GetYaxis()->SetRangeUser(0, theta_dist->GetMaximum()*4.0);
-    function->SetLineColor(kRed);
-    function->SetLineWidth(2);
-    c16->SetGrid();
-    theta_dist->Draw("");
-    function->Draw("same");
-    Rtt->Draw("P same");
     c16->Update();
 
-    TCanvas* c17 = new TCanvas("c17", "Invariant Mass Distribution", 800, 600);
+
+    TCanvas* c17 = new TCanvas("c17", "Theta Distribution", 800, 600);
+    TPad *pad1 = new TPad("pad1", "Top pad", 0, 0.3, 1, 1.0);
+    pad1->SetBottomMargin(0); // Upper pad has no bottom margin
+    pad1->Draw();
+    pad1->cd();
+    theta_dist_cs->SetStats(0);
+    theta_dist_cs->GetXaxis()->SetTitle("#theta (radians)");
+    theta_dist_cs->GetYaxis()->SetTitle("Events");
+    theta_dist_cs->SetTitle("Theta Distribution");
+    theta_dist_cs->GetXaxis()->CenterTitle();
+    theta_dist_cs->GetYaxis()->CenterTitle();
+    theta_dist_cs->SetMarkerStyle(20);
+    theta_dist_cs->SetMarkerSize(0.5);
+    theta_dist_cs->SetMarkerColor(kMagenta);
+    theta_dist_cs->GetYaxis()->SetRangeUser(theta_dist_cs->GetMinimum()*0.8, theta_dist_cs->GetMaximum()*1.2);
+    f_model_cs->SetParameters(1, 0.97,0,0);  // initial guesses
+    f_model_cs->FixParameter(3, avg_m2OverE2); // Fix parameter [3] to 0.97
+    // Normalize to unit area
+    if (theta_dist_cs->Integral() > 0)
+    theta_dist_cs->Scale(1.0 / theta_dist_cs->Integral("width")); // Normalize to unit area
+    // 🔹 Fit histogram with your f_model
+    theta_dist_cs->Fit(f_model_cs, "R");   // "R" = restrict fit to function range
+
+    //theta_dist->GetYaxis()->SetRangeUser(0.2, theta_dist->GetMaximum()*1.2);
+
+    theta_dist_ms->SetStats(0);
+    theta_dist_ms->SetLineColor(kGreen);
+    theta_dist_ms->Scale(1.0 / theta_dist_ms->Integral("width")); // Normalize to unit area
+    f_model_ms->SetParameters(1, 0.97,0);
+    f_model_ms->FixParameter(3, avg_m2OverE2); // Fix parameter [3] to 0.97
+    //theta_dist_ms->Fit(f_model_ms, "R");   // "R" = restrict fit to function range, "+" = add to previous fit
+
+
+    c17->SetGrid();
+    theta_dist_cs->Draw("hist");  // with error bars
+    f_model_cs->SetLineColor(kRed);
+    f_model_cs->SetLineWidth(1);
+    f_model_cs->Draw("same");  // overlay fit
+    theta_dist_ms->Draw("hist same");
+    f_model_ms->SetLineColor(kGreen+2);
+    f_model_ms->SetLineWidth(1);
+    f_model_ms->Draw("same");  // overlay fit
+    normalizeGraph(Rtt);
+    Rtt->Draw("P");
+    c17->cd();
+    TPad *pad2 = new TPad("pad2", "Bottom pad", 0, 0.05, 1, 0.3);
+    pad2->SetTopMargin(0);
+    pad2->SetBottomMargin(0.3); // ratio plot needs bigger bottom margin
+    pad2->Draw();
+    pad2->cd();
+    TH1D* ratio = (TH1D*)theta_dist_cs->Clone("ratio");
+    ratio->SetTitle(""); // Remove the title for the ratio plot
+    ratio->GetYaxis()->SetTitle("Histo/Korchin");
+    ratio->GetXaxis()->SetTitle("#theta (radians)");
+    ratio->GetXaxis()->CenterTitle();
+    ratio->GetYaxis()->CenterTitle();
+    ratio->GetYaxis()->SetTitleSize(0.1);
+    ratio->GetYaxis()->SetLabelSize(0.1);
+    ratio->GetXaxis()->SetTitleSize(0.1);
+    ratio->GetXaxis()->SetLabelSize(0.1);
+    ratio->GetYaxis()->SetNdivisions(505);
+    TH1D* RttNew = graphToHist(Rtt, ratio);
+    ratio->Divide(RttNew);
+    ratio->GetYaxis()->SetRangeUser(0.9, 1.1);
+    ratio->Draw("hist");
+    c17->Update();
+
+    TCanvas* c18 = new TCanvas("c18", "Invariant Mass Distribution", 800, 600);
     Invariant_dist->SetStats(0);
     Invariant_dist->GetXaxis()->SetTitle("Invariant Mass (GeV)");
     Invariant_dist->GetYaxis()->SetTitle("Events");
@@ -336,24 +399,11 @@ void HistManager::DrawHistograms() {
     Invariant_dist->SetMarkerStyle(20);
     Invariant_dist->SetMarkerSize(0.5);
     Invariant_dist->SetMarkerColor(kMagenta);
-    c17->SetGrid();
-    Invariant_dist->Draw("");
-    c17->Update();
-
-
-    TCanvas* c18 = new TCanvas("c18", "Rtt Distribution", 800, 600);
-    Rtt->SetStats(0);
-    Rtt->GetXaxis()->SetTitle("cos(#theta)");
-    Rtt->GetYaxis()->SetTitle("Events");
-    Rtt->SetTitle("Rtt Distribution");
-    Rtt->GetXaxis()->CenterTitle();
-    Rtt->GetYaxis()->CenterTitle();
-    Rtt->SetMarkerStyle(20);
-    Rtt->SetMarkerSize(0.5);
-    Rtt->SetMarkerColor(kMagenta);
     c18->SetGrid();
-    Rtt->Draw("AP");
+    Invariant_dist->Draw("");
     c18->Update();
+
+
 
     TCanvas* c19 = new TCanvas("c19", "Tau Z Momenta", 800, 600);
     tauZMomenta->SetStats(0);
@@ -371,32 +421,31 @@ void HistManager::DrawHistograms() {
 
     //ps.Close();
 
+    TString outFile = Form("output_histos_%.2fGeV.pdf", beamEnergy);
 
     // after you draw c1..c9
-    c1->Print("output_histos.pdf[");  // open
-    c1->Print("output_histos.pdf");   // page 1
-    c2->Print("output_histos.pdf");   // page 2
-    c3->Print("output_histos.pdf");
-    c4->Print("output_histos.pdf");
-    c5->Print("output_histos.pdf");
-    c6->Print("output_histos.pdf");
-    c7->Print("output_histos.pdf");
-    c8->Print("output_histos.pdf");
-    c9->Print("output_histos.pdf");
-    c10->Print("output_histos.pdf");  // last page
-    c11->Print("output_histos.pdf");
-    c12->Print("output_histos.pdf");
-    c13->Print("output_histos.pdf");
-    c14->Print("output_histos.pdf");
-    c15->Print("output_histos.pdf");
-    c16->Print("output_histos.pdf");
-    c17->Print("output_histos.pdf");
-    c18->Print("output_histos.pdf");
-    c19->Print("output_histos.pdf");
-    c19->Print("output_histos.pdf]");  // close
+    c1->Print(outFile + "[");  // open
+    c1->Print(outFile);   // page 1
+    c2->Print(outFile);   // page 2
+    c3->Print(outFile);
+    c4->Print(outFile);
+    c5->Print(outFile);
+    c6->Print(outFile);
+    c7->Print(outFile);
+    c8->Print(outFile);
+    c9->Print(outFile);
+    c10->Print(outFile);
+    c11->Print(outFile);
+    c12->Print(outFile);
+    c13->Print(outFile);
+    c14->Print(outFile);
+    c15->Print(outFile);
+    c16->Print(outFile);
+    c17->Print(outFile);
+    c18->Print(outFile);
+    c19->Print(outFile);
+    c19->Print(outFile + "]");  // close
 
-
-    c7->SaveAs("soft_photons.png");
 
     currentDir->cd();
 }
