@@ -352,7 +352,7 @@ void HistManager::DrawHistograms(double beamEnergy, double avg_m2OverE2) {
     theta_dist_ms->Scale(1.0 / theta_dist_ms->Integral("width")); // Normalize to unit area
     f_model_ms->SetParameters(1, 0.97,0);
     f_model_ms->FixParameter(3, avg_m2OverE2); // Fix parameter [3] to 0.97
-    //theta_dist_ms->Fit(f_model_ms, "R");   // "R" = restrict fit to function range, "+" = add to previous fit
+    theta_dist_ms->Fit(f_model_ms, "R");   // "R" = restrict fit to function range, "+" = add to previous fit
 
 
     c17->SetGrid();
@@ -419,6 +419,19 @@ void HistManager::DrawHistograms(double beamEnergy, double avg_m2OverE2) {
     tauZMomenta->Draw("");
     c19->Update();
 
+    TCanvas* c20 = new TCanvas("c20", "Rtt Plot", 800, 600);
+    Rtt->SetTitle("Rtt Plot");
+    Rtt->GetXaxis()->SetTitle("cos(theta)");
+    Rtt->GetYaxis()->SetTitle("Rtt");
+    Rtt->GetXaxis()->CenterTitle();
+    Rtt->GetYaxis()->CenterTitle();
+    Rtt->SetMarkerStyle(20);
+    Rtt->SetMarkerSize(0.5);
+    Rtt->SetMarkerColor(kMagenta);
+    c20->SetGrid();
+    Rtt->Draw("AP");
+    c20->Update();
+
     //ps.Close();
 
     TString outFile = Form("output_histos_%.2fGeV.pdf", beamEnergy);
@@ -444,7 +457,8 @@ void HistManager::DrawHistograms(double beamEnergy, double avg_m2OverE2) {
     c17->Print(outFile);
     c18->Print(outFile);
     c19->Print(outFile);
-    c19->Print(outFile + "]");  // close
+    c20->Print(outFile);
+    c20->Print(outFile + "]");  // close
 
 
     currentDir->cd();

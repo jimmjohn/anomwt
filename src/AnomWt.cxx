@@ -23,6 +23,7 @@ void AnomWt::compute() {
   E = sqrt(pow((P1[0] + P2[0]), 2.) - pow((P1[1] + P2[1]), 2.) - pow((P1[2] + P2[2]), 2.) - pow((P1[3] + P2[3]), 2.)) / 2.0;   //Since we are adding the photon
 
 
+
   // 5) Rotate about z to eliminate y‐components of P2
   double fi;
   double randSave = gRandom->Uniform();
@@ -41,6 +42,16 @@ void AnomWt::compute() {
 
   double thetataupair = std::acos(PB1[3]/(std::sqrt(PB1[1]*PB1[1] + PB1[2]*PB1[2] +PB1[3]*PB1[3])));
 
+//   // 7) Align beam‐difference to x–z plane
+//   double angle_1 = KinLib::ANGFI(PB1[1], PB1[2]);
+//   for(auto& arr : { &H1, &P1, &PB1}) {
+//         KinLib::ROTOD3(-angle_1, *arr, *arr);
+//   }
+//   double angle_2 = KinLib::ANGFI(PB2[1], PB2[2]);
+//   for(auto& arr : { &H2, &P2, &PB2}) {
+//         KinLib::ROTOD3(-angle_2, *arr, *arr);
+//   }
+
   // 7) Align beam‐difference to x–z plane
   switch(frameOption){
       case 1:
@@ -53,6 +64,7 @@ void AnomWt::compute() {
           for(int k=0; k<4; ++k) PBB[k] = PB2[k];
           break;
   }
+
 
   //double fi1 = KinLib::ANGFI(PBB[1], PBB[2]);
   double fi1 = KinLib::ANGXY(PBB[1], PBB[2]);     //Modified by AT, 21.09.2025
@@ -72,7 +84,7 @@ void AnomWt::compute() {
   DipoleEERij probablity_calc(0);
   auto Rtt1 = probablity_calc.calculate(E, acos(0.5), 0., 0., 0., 0., 0., 0., 0., 0.);
   auto Rtt2 = probablity_calc.calculate(E, acos(-0.5), 0., 0., 0., 0., 0., 0., 0., 0.);
-  double A = 0* (5.0/2.0)*(Rtt1[3][3]-Rtt2[3][3])/(Rtt1[3][3]+Rtt2[3][3]);
+  double A =  (5.0/2.0)*(Rtt1[3][3]-Rtt2[3][3])/(Rtt1[3][3]+Rtt2[3][3]);
   // New probabilities to Mustraal is added by Z. Was ---> inroduction of mass term effect and FBasymmetry.
   double T1 = PB1[0] * PB1[0] * (1.0 + cos(theta1) * cos(theta1)+ pow(Physics::m_tau,2)/(P1[0]*P1[0])*sin(theta1)*sin(theta1)+ A*cos(theta1));
   double T2 = PB2[0] * PB2[0] * (1.0 + cos(theta2) * cos(theta2)+ pow(Physics::m_tau,2)/(P1[0]*P1[0])*sin(theta2)*sin(theta2)+ A*cos(theta2));

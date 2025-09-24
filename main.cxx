@@ -59,7 +59,7 @@ int main(int argc, char** argv) {
     int printEvts = 0;
     int countSelected = 0;
     double beamEnergy;
-    double invariantCut = 100.0; // GeV
+    double invariantCut = 3.0; // GeV
     double sum_m2OverE2CS = 0.0;
 
 
@@ -78,7 +78,7 @@ int main(int argc, char** argv) {
 
         bool selected = true;;
 
-        if(nevts > 10000) break; // Limit to 100000 events
+        if(nevts > 1000000) break; // Limit to 100000 events
         evtIn = {};
         if(nevts<printEvts){std::cout<< "\n"<< "Evt number: "<<nevts<<std::endl;}
         if(nevts%1000000==0){std::cout<< "\n"<< "Evt number: "<<nevts<<std::endl;}
