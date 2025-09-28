@@ -31,4 +31,13 @@ void Observables::Acoplanarity(EventInitilizers& evtIn) {
   TVector3 ref = (pipm + pizm).Unit();
   double sign_ang = ref.Dot(n1.Cross(n2)); // Scalar triple product
   if (sign_ang < 0) acoplanarity_angle = 2 * TMath::Pi() - acoplanarity_angle; // Now acc_angle in [0, 2pi]
+
+  //Checking direction of polarimetric vectors
+  // std::cout<<"Direction of H1: "<<evtIn.m_HvCloneTaum[1]<<" "<<evtIn.m_HvCloneTaum[2]<<" "<<evtIn.m_HvCloneTaum[3]<<std::endl;
+  // std::cout<<"Direction of pipm+pizm: "<<(pipm+pizm).Unit()[0]<<" "<<(pipm+pizm).Unit()[1]<<" "<<(pipm+pizm).Unit()[2]<<std::endl;
+  // std::cout<<"Direction of H2: "<<evtIn.m_HvCloneTaul[1]<<" "<<evtIn.m_HvCloneTaul[2]<<" "<<evtIn.m_HvCloneTaul[3]<<std::endl;
+  // std::cout<<"Direction of pipl+pizl: "<<(pipl+pizl).Unit()[0]<<" "<<(pipl+pizl).Unit()[1]<<" "<<(pipl+pizl).Unit()[2]<<std::endl;
+
+
+
 }

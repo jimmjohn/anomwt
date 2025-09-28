@@ -48,6 +48,17 @@ void HistManager::DrawHistograms(double beamEnergy, double avg_m2OverE2) {
     helicity_corr_standalone->Draw("COLZ TEXT");
     c2->Update();
 
+    //JMJ added to save the standalone helicity correlation
+    TCanvas* c2b = new TCanvas("c2b", "Helicity Correlation_Standalone_Mustraal", 800, 600);
+    helicity_corr_st_mustraal->SetStats(0);
+    helicity_corr_st_mustraal->GetXaxis()->CenterTitle();
+    helicity_corr_st_mustraal->GetYaxis()->CenterTitle();
+    helicity_corr_st_mustraal->SetMarkerStyle(20);
+    helicity_corr_st_mustraal->SetMarkerColor(kBlack);
+    c2b->SetGrid();
+    helicity_corr_st_mustraal->Draw("COLZ TEXT");
+    c2b->Update();
+
     //ps.NewPage();
     TCanvas* c3 = new TCanvas("c3", "WT Correlation", 800, 600);
     wt_corr_KT_KA->SetStats(0);
@@ -432,6 +443,50 @@ void HistManager::DrawHistograms(double beamEnergy, double avg_m2OverE2) {
     Rtt->Draw("AP");
     c20->Update();
 
+    TCanvas* c21 = new TCanvas("c21", "wtw Plot", 800, 600);
+    c21->Divide(2,2);
+    c21->cd(1);
+    wtwPP->SetTitle("wtwPP Plot");
+    wtwPP->GetXaxis()->SetTitle("wtwPP");
+    wtwPP->GetYaxis()->SetTitle("Events");
+    wtwPP->GetXaxis()->CenterTitle();
+    wtwPP->GetYaxis()->CenterTitle();
+    wtwPP->SetMarkerStyle(20);
+    wtwPP->SetMarkerSize(0.5);
+    wtwPP->Draw("hist");
+    c21->cd(2);
+    wtwMM->SetTitle("wtwMM Plot");
+    wtwMM->GetXaxis()->SetTitle("wtwMM");
+    wtwMM->GetYaxis()->SetTitle("Events");
+    wtwMM->GetXaxis()->CenterTitle();
+    wtwMM->GetYaxis()->CenterTitle();
+    wtwMM->SetMarkerStyle(20);
+    wtwMM->SetMarkerSize(0.5);
+    wtwMM->Draw("hist");
+    c21->cd(3);
+    wtwPM->SetTitle("wtwPM Plot");
+    wtwPM->GetXaxis()->SetTitle("wtwPM");
+    wtwPM->GetYaxis()->SetTitle("Events");
+    wtwPM->GetXaxis()->CenterTitle();
+    wtwPM->GetYaxis()->CenterTitle();
+    wtwPM->SetMarkerStyle(20);
+    wtwPM->SetMarkerSize(0.5);
+    wtwPM->Draw("hist");
+    c21->cd(4);
+    wtwMP->SetTitle("wtwMP Plot");
+    wtwMP->GetXaxis()->SetTitle("wtwMP");
+    wtwMP->GetYaxis()->SetTitle("Events");
+    wtwMP->GetXaxis()->CenterTitle();
+    wtwMP->GetYaxis()->CenterTitle();
+    wtwMP->SetMarkerStyle(20);
+    wtwMP->SetMarkerSize(0.5);
+    wtwMP->Draw("hist");
+    c21->Update();
+
+    TCanvas* c22 = new TCanvas("c22", "Polarimetric vector", 800, 600);
+    H1_H2->SetMarkerColor(kGreen);
+    H1_H2->Draw("P");
+
     //ps.Close();
 
     TString outFile = Form("output_histos_%.2fGeV.pdf", beamEnergy);
@@ -440,6 +495,7 @@ void HistManager::DrawHistograms(double beamEnergy, double avg_m2OverE2) {
     c1->Print(outFile + "[");  // open
     c1->Print(outFile);   // page 1
     c2->Print(outFile);   // page 2
+    c2b->Print(outFile);   // page 2b //JMJ added
     c3->Print(outFile);
     c4->Print(outFile);
     c5->Print(outFile);
@@ -458,7 +514,9 @@ void HistManager::DrawHistograms(double beamEnergy, double avg_m2OverE2) {
     c18->Print(outFile);
     c19->Print(outFile);
     c20->Print(outFile);
-    c20->Print(outFile + "]");  // close
+    c21->Print(outFile);
+    c22->Print(outFile);
+    c22->Print(outFile + "]");  // close
 
 
     currentDir->cd();

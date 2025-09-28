@@ -6,6 +6,7 @@
 #include <TMath.h>
 #include <TF1.h>
 #include <TGraph.h>
+#include <TGraph2D.h>
 
 
 class HistManager {
@@ -15,6 +16,7 @@ public:
   // Histograms
     TH2F* helicity_corr = new TH2F("helicity_corr", "Helicity1 vs Helicity2;Helicity1;Helicity2", 3, -1.5, 1.5, 3, -1.5, 1.5);
     TH2F* helicity_corr_standalone = new TH2F("helicity_corr_standalone", "Helicity1 vs Helicity2 (Standalone);Helicity1_StandAlone;Helicity2_StandAlone", 3, -1.5, 1.5, 3, -1.5, 1.5);
+    TH2F* helicity_corr_st_mustraal = new TH2F("helicity_corr_st_mustraal", "Helicity1 vs Helicity2 (Standalone Mustraal);Helicity1_StandAlone;Helicity2_StandAlone", 3, -1.5, 1.5, 3, -1.5, 1.5);
     TH2F* wt_corr_KT_KA = new TH2F("wt_corr_KT_KA", "wt correlation (KT-KA);wt_KT;wt_KA", 100, 0, 4.0, 100, 0, 4.0);
     TH2F* wt_corr_KT_ST = new TH2F("wt_corr_KT_ST", "wt correlation (KT-ST);wt_KT;wt_ST", 100, 0, 4.0, 100, 0, 4.0);
     TH2F* wt_corr_KT_SA = new TH2F("wt_corr_KT_SA", "wt correlation (KT-SA);wt_KT;wt_SA", 100, 0, 4.0, 100, 0, 4.0);
@@ -39,12 +41,15 @@ public:
     TH2F* p2_frame_corr_hard = new TH2F("p2_frame_corr_hard", "P2 Frame Correlation;wt_KKMCee;wt_StandAlone", 100, 0, 4.0, 100, 0, 4.0);
     TH2F* mustraal_corr_hard = new TH2F("mustraal_corr_hard", "Mustraal Correlation;wt_KKMCee;wt_StandAlone", 100, 0, 4.0, 100, 0, 4.0);
 
-
-
     TH1D* theta_dist_cs = new TH1D("theta_dist_cs", "Theta Distribution;#theta;Events", 100, -1.0, 1.0);
     TH1D* theta_dist_ms = new TH1D("theta_dist_ms", "Theta Distribution;#theta;Events", 100, -1.0, 1.0);
     TH1D* Invariant_dist = new TH1D("Invariant_dist", "Invariant Mass Distribution;Invariant Mass (GeV);Events", 100, 0.0, 6.0);
     TH1D* directTheta_dist = new TH1D("directTheta_dist", "Direct Theta Distribution;#theta;Events", 100, -1.0,1.0);
+
+    TH1D* wtwPP = new TH1D("wtwPP", "wtwPP", 10000, 0.0, 1.0);
+    TH1D* wtwMM = new TH1D("wtwMM", "wtwMM", 10000, 0.0, 1.0);
+    TH1D* wtwPM = new TH1D("wtwPM", "wtwPM", 10000, 0.0, 1.0);
+    TH1D* wtwMP = new TH1D("wtwMP", "wtwMP", 10000, 0.0, 1.0);
 
     double alpha = 7.2973525693e-3;
     double prefactor = 4 * TMath::Pi() * TMath::Pi() * alpha * alpha;
@@ -55,6 +60,10 @@ public:
     TGraph* Rtt = new TGraph();
 
     TH1D* tauZMomenta = new TH1D("tauZMomenta", "Tau Z Momenta;Momentum (GeV);Events", 100, -6.0, 6.0);
+
+    TGraph2D *H1= new TGraph2D();
+    TGraph2D *H2= new TGraph2D();
+    TGraph2D *H1_H2= new TGraph2D();
 
 
 

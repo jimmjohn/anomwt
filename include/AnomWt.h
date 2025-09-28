@@ -58,6 +58,9 @@ public:
     double directThetaVal() const { return directTheta; }
     double TransverseMomentum() const { return m_transverseMomentum; }
     double taumomentaz() const { return m_tau_momentum_z; }  // added
+    double (&getwtw())[2][2] { return wtwProb;  }
+    TVector3 getH1vec() const { return H1_vec; }
+    TVector3 getH2vec() const { return H2_vec; }
 
     // If you prefer public fields, you can expose these directly instead of getters.
 
@@ -84,6 +87,10 @@ private:
     double directTheta{0.0}; // for debugging
     double m_transverseMomentum{0.0};
     double m_tau_momentum_z{0.0};  // added
+    double wtw[2][2] = {0.0};
+    double wtwProb[2][2] = {0.0};
+    TVector3 H1_vec;
+    TVector3 H2_vec;
 
     // Build a right-handed beam basis: z_b = PB1, x_b = (PBB ⟂ z_b), y_b = z_b × x_b
     static inline TRotation BuildBeamRotation(const TVector3& pb1, const TVector3& pbb)

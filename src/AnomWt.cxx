@@ -2,7 +2,7 @@
 #include "PhysicsConstants.h"
 
 void AnomWt::compute() {
-  // 3) Build the tau‐pair rest frame
+  // 1) Build the tau‐pair rest frame
   std::array<double,4> QQ, PB1{0,0,0,1}, PB2{0,0,0,1}, PBB ;
   for(int k=0; k<4; ++k) {
       QQ[k] = P1[k] + P2[k];
@@ -16,15 +16,16 @@ void AnomWt::compute() {
   m_tau_momentum_z = P1[3];
   m_transverseMomentum = sqrt(pow((P1[1] + P2[1]), 2.) + pow((P1[2] + P2[2]), 2.));
 
+//   double p1_z = P1[3];
+//   double p2_z = P2[3];
+
   for(auto& arr : { &H1, &H2, &P1, &P2, &PB1, &PB2}) {
       KinLib::BostDQ(1, QQ, *arr, *arr);
   }
   //Invarian mass of tau pair system (s^\prime = (pbeam1 + pbeam2 - k)**2)
   E = sqrt(pow((P1[0] + P2[0]), 2.) - pow((P1[1] + P2[1]), 2.) - pow((P1[2] + P2[2]), 2.) - pow((P1[3] + P2[3]), 2.)) / 2.0;   //Since we are adding the photon
 
-
-
-  // 5) Rotate about z to eliminate y‐components of P2
+  // 2) Rotate about z to eliminate y‐components of P2
   double fi;
   double randSave = gRandom->Uniform();
   fi = KinLib::ANGFI(P1[1], P1[2]);
@@ -32,7 +33,7 @@ void AnomWt::compute() {
       KinLib::ROTOD3(-fi, *arr, *arr);
   }
 
-  // 6) Rotate about y to align taus along z
+  // 3) Rotate about y to align taus along z
   //double thet = std::acos(-PB1[3]/std::sqrt(PB1[1]*PB1[1] + PB1[2]*PB1[2] + PB1[3]*PB1[3]));
   double thet;
   thet = KinLib::ANGXY(P1[3], P1[1]);
@@ -42,7 +43,7 @@ void AnomWt::compute() {
 
   double thetataupair = std::acos(PB1[3]/(std::sqrt(PB1[1]*PB1[1] + PB1[2]*PB1[2] +PB1[3]*PB1[3])));
 
-//   // 7) Align beam‐difference to x–z plane
+//   // 4) Align beam‐difference to x–z plane
 //   double angle_1 = KinLib::ANGFI(PB1[1], PB1[2]);
 //   for(auto& arr : { &H1, &P1, &PB1}) {
 //         KinLib::ROTOD3(-angle_1, *arr, *arr);
@@ -52,7 +53,7 @@ void AnomWt::compute() {
 //         KinLib::ROTOD3(-angle_2, *arr, *arr);
 //   }
 
-  // 7) Align beam‐difference to x–z plane
+  // 4) Align beam‐difference to x–z plane
   switch(frameOption){
       case 1:
           for(int k=0; k<4; ++k) PBB[k] = PB1[k] - PB2[k];//Collins-Soper frame
@@ -116,12 +117,13 @@ void AnomWt::compute() {
       KinLib::BostDQ(1, P2, *arr, *arr);
   }
 
+
   TVector3 Fp1(P1[1],P1[2],P1[3]);
   TVector3 Fp2(P2[1],P2[2],P2[3]);
   TVector3 Fpb1(PB1[1],PB1[2],PB1[3]);
   TVector3 Fpb2(PB2[1],PB2[2],PB2[3]);
 
-  // 10) Compute angle with respect to tau-/z axis & prepare R0,R matrices
+  // 5) Compute angle with respect to tau-/z axis & prepare R0,R matrices
   switch(frameOption){
       case 1:
           m_theta = std::acos(PB1[3] /std::sqrt(PB1[1]*PB1[1] + PB1[2]*PB1[2] + PB1[3]*PB1[3]));
@@ -133,6 +135,12 @@ void AnomWt::compute() {
           m_theta = std::acos(-PB2[3]/std::sqrt(PB2[1]*PB2[1] + PB2[2]*PB2[2] + PB2[3]*PB2[3]));
           break;
   }
+
+//   if(cos(m_theta)>0.98) {
+//   std::cout<<"P1Z="<< p1_z<<std::endl;
+//   std::cout<<"P2Z="<< p2_z<<std::endl;
+//   std::cout<<"Initial theta="<< cos(initial_theta) << " Theta tau pair="<< cos(thetataupair) << " Final theta="<< cos(m_theta) << std::endl;
+//   }
 
   m_tauMomentum = abs(sqrt(P1[1]*P1[1] + P1[2]*P1[2] + P1[3]*P1[3]));
   m_tauEnergy = P1[0];
@@ -157,6 +165,7 @@ void AnomWt::compute() {
 
   Rtt_val = R0[3][3];
 
+
   // Change the format of polarimetric vectors to match the expected format
   std::array<double,4> H1_copy = H1;
   std::array<double,4> H2_copy = H2;
@@ -166,6 +175,7 @@ void AnomWt::compute() {
   }
   H1[3] = H1_copy[0]; // Time component
   H2[3] = H2_copy[0]; // Time component
+
 
   // spin‐weight numerator/denominator
   double sign[4] = {1., -1., 1., -1.};
@@ -177,7 +187,7 @@ void AnomWt::compute() {
       }
   }
 
-    //TVector3 pb1(PB1[1], PB1[2], PB1[3]);               // e- direction
+  //TVector3 pb1(PB1[1], PB1[2], PB1[3]);               // e- direction
   TVector3 pbb;                                       // plane direction
   if (frameOption==1)      pbb = TVector3(PB2[1]-PB1[1], PB2[2]-PB1[2], PB2[3]-PB1[3]); // Collins–Soper
   else if (frameOption==2) pbb = TVector3(PB1[1], PB1[2], PB1[3]);                      // beam1-based
@@ -197,25 +207,31 @@ void AnomWt::compute() {
 
   // New add by AT
   // Helicity approximated weight calulation
-  double wtw[2][2] = {0.0};
   m_spinWeight_approx= 0.0;
   for (int m=0; m<2; ++m) {
       for (int n=0; n<2; ++n) {
           double sign_m = (m == 0) ? -1 : 1;
           double sign_n = (n == 0) ? -1 : 1;
           //double factor = m_wtSPIN0 / kkmc_wt; // to normalize to KKMC weight
-          double term1 = H1[3] - sign_m * H1[2];
+          double term1 = H1[3] - sign_n * H1[2];
           double term2 = (R0[3][3] - sign_n * R0[3][2] + sign_m * R0[2][3] - sign_m * sign_n * R0[2][2])/R0[3][3];
-          double term3 = H2[3] + sign_n * H2[2];
+          double term3 = H2[3] + sign_m * H2[2];
           wtw[m][n] = term1 * term2 * term3;
+          //wtw[m][n] = term2;
           m_spinWeight_approx += wtw[m][n];
+          //std::cout<<"term2="<<term2<<std::endl;
       }
   }
+
+  H1_vec.SetXYZ(H1[0], H1[1], H1[2]);
+  H2_vec.SetXYZ(H2[0], H2[1], H2[2]);
+
 
   m_spinWeight_approx /= 4.0;  // average over 4 combinations
 
   // normalize to make probabilities
   double wts = wtw[0][0] + wtw[0][1] + wtw[1][0] + wtw[1][1];
+  wtwProb[0][0]=wtw[0][0]/wts; wtwProb[0][1]=wtw[0][1]/wts; wtwProb[1][0]=wtw[1][0]/wts; wtwProb[1][1]=wtw[1][1]/wts;
   wtw[0][0]=wtw[0][0]/wts;
   wtw[0][1]=wtw[0][0]+wtw[0][1]/wts;
   wtw[1][0]=wtw[0][1]+wtw[1][0]/wts;

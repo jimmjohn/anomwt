@@ -38,7 +38,7 @@ int main(int argc, char** argv) {
     std::cout << "   Using polarimetric vectors and helicity-like quantities\n";
     std::cout << "   from HepMC3 files filled in by KKMCee.\n";
     std::cout << "------------------------------------------------------------\n";
-    std::cout << "   Version: Sept 4, 2025\n";
+    std::cout << "   Version: Sept 28, 2025\n";
     std::cout << "------------------------------------------------------------\n";
     std::cout << "   Notes:\n";
     std::cout << "   * Algorithm works for any tau decay modes.\n";
@@ -61,7 +61,6 @@ int main(int argc, char** argv) {
     double beamEnergy;
     double invariantCut = 3.0; // GeV
     double sum_m2OverE2CS = 0.0;
-
 
     //Try reading using HepMC3 Reader
     HepMC3::ReaderAscii reader(filename);
@@ -94,10 +93,8 @@ int main(int argc, char** argv) {
         if(evtIn.heTaum==0 || evtIn.heTaul==0) continue; //skip if helicities not found
         if(evtIn.pvTaum_found==false || evtIn.pvTaul_found==false) continue; //skip if polarimetric vectors not found
 
-
         histSave->tauZMomenta->Fill(evtIn.P1[3]);
         histSave->tauZMomenta->Fill(evtIn.P2[3]);
-
 
         //Observables calculation
         Observables obs;
@@ -119,19 +116,13 @@ int main(int argc, char** argv) {
         anomwtCS2.compute();
         anomwtCS3.compute();
 
-
-        //if(!anomwtCS1.selected())std::cout<<"selected: "<<anomwtCS1.selected()<<std::endl;
         if(anomwtCS1.hardSoft()<0.02) {
-        histSave->helicity_corr->Fill(evtIn.heTaum, evtIn.heTaul);
-        histSave->helicity_corr_standalone->Fill(anomwtCS1.approxHel1(), anomwtCS1.approxHel2());
         histSave->wt_corr_KT_KA->Fill(evtIn.wt, evtIn.wt_approx);
         histSave->wt_corr_KT_ST->Fill(evtIn.wt, anomwtCS1.wtSPIN0());
         histSave->wt_corr_KT_SA->Fill(evtIn.wt, anomwtCS1.spinApproxWt());
         histSave->wt_corr_KA_SA->Fill(evtIn.wt_approx, anomwtCS1.spinApproxWt());
         histSave->wt_corr_ST_SA->Fill(anomwtCS1.wtSPIN0(), anomwtCS1.spinApproxWt());
         }
-
-        //std::cout<<"Selected events: "<<countSelected<<" out of "<<nevts<<" events"<< " hardSoft="<<anomwtCS1.hardSoft()<<std::endl;
 
         histSave->hardSoft_Histo->Fill(anomwtCS1.hardSoft());
 
@@ -150,9 +141,6 @@ int main(int argc, char** argv) {
             histSave->h_angle_03->Fill(acc_angle, anomwtCS3.wtME());
             histSave->h_angle3->Fill(acc_angle, anomwtCS3.wtSPIN()/anomwtCS3.wtSPIN0()*anomwtCS3.wtME());
         }
-
-        // wtSPIN0 = anomwtCS1.wtSPIN0()/evtIn.wt*anomwtCS1.wtME();
-        // wtSPIN = anomwtCS1.wtSPIN()/evtIn.wt*anomwtCS1.wtME();
 
         double E2CS = pow(anomwtCS1.Invariant(),2);
         if (E2CS > 0 && anomwtCS1.Invariant() < invariantCut) {
@@ -180,18 +168,31 @@ int main(int argc, char** argv) {
         double wtMustraal = anomwtPB1.prob()*anomwtPB1.wtSPIN() + anomwtPB2.prob()*anomwtPB2.wtSPIN();
 
         double thetaMustraal;
-        if(anomwtPB1.prob()>anomwtPB2.prob()) {thetaMustraal = anomwtPB1.theta();}
-        else {thetaMustraal = anomwtPB2.theta();}
+        double approxHel1MS, approxHel2MS;
+        if(anomwtPB1.prob()>anomwtPB2.prob()) {thetaMustraal = anomwtPB1.theta();approxHel1MS = anomwtPB1.approxHel1(); approxHel2MS = anomwtPB1.approxHel2();}
+        else {thetaMustraal = anomwtPB2.theta(); approxHel1MS = anomwtPB2.approxHel1(); approxHel2MS = anomwtPB2.approxHel2();}
 
-        //std::cout<<"Prob sum: "<<anomwtPB1.prob()+anomwtPB2.prob()<<std::endl;
+        if(cos(anomwtCS1.theta())<0.05 && cos(anomwtCS1.theta())>-0.05) {
+        //if(cos(anomwtCS1.theta())>0.98) {
+        //if(anomwtCS1.hardSoft()<=0.2) {
+        //if(1) {
+            //std::cout<<cos(anomwtCS1.theta())<<" "<<cos(thetaMustraal)<<std::endl;
+            histSave->helicity_corr->Fill(evtIn.heTaum, evtIn.heTaul);
+            histSave->helicity_corr_standalone->Fill(anomwtCS1.approxHel1(), anomwtCS1.approxHel2());
+            histSave->wtwPP->Fill(anomwtCS1.getwtw()[0][0]);
+            histSave->wtwMM->Fill(anomwtCS1.getwtw()[1][1]);
+            histSave->wtwPM->Fill(anomwtCS1.getwtw()[0][1]);
+            histSave->wtwMP->Fill(anomwtCS1.getwtw()[1][0]);
+        }
+        //if(cos(thetaMustraal)<0.05 && cos(thetaMustraal)>-0.05) {
+        if(anomwtCS1.hardSoft()<=0.2) {
+        //if(1) {
+            histSave->helicity_corr_st_mustraal->Fill(approxHel1MS, approxHel2MS);
+        }
 
-        // if(prob2>0.5){
-        //     wtMustraal0 = wtSPIN02;
-        // } else if(prob3>0.5) {
-        //     wtMustraal0 = wtSPIN03;
-        // } else{
-        //     wtMustraal0 = prob2*wtSPIN02 + prob3*wtSPIN03;
-        // }
+        histSave->H1->SetPoint(nevts, anomwtCS1.getH1vec().X(), anomwtCS1.getH1vec().Y(), anomwtCS1.getH1vec().Z());
+        histSave->H2->SetPoint(nevts, anomwtCS1.getH2vec().X(), anomwtCS1.getH2vec().Y(), anomwtCS1.getH2vec().Z());
+        histSave->H1_H2->SetPoint(nevts, anomwtCS1.getH1vec().X() - anomwtCS1.getH2vec().X(), anomwtCS1.getH1vec().Y() - anomwtCS1.getH2vec().Y(), anomwtCS1.getH1vec().Z() - anomwtCS1.getH2vec().Z());
 
         if(anomwtCS1.hardSoft()<=0.2) {
             histSave->collins_soper_corr_soft->Fill(evtIn.wt, anomwtCS1.wtSPIN0());
@@ -207,8 +208,11 @@ int main(int argc, char** argv) {
 
         beamEnergy = evtIn.beamEnergy;
 
-        if(anomwtCS1.Invariant()<invariantCut) histSave->theta_dist_cs->Fill(cos(anomwtCS1.theta()));
-        if(anomwtPB1.Invariant()<invariantCut) histSave->theta_dist_ms->Fill(cos(thetaMustraal));
+        // if(anomwtCS1.Invariant()<invariantCut) histSave->theta_dist_cs->Fill(cos(anomwtCS1.theta()));
+        // if(anomwtPB1.Invariant()<invariantCut) histSave->theta_dist_ms->Fill(cos(thetaMustraal));
+        if(anomwtCS1.hardSoft()<=0.2) histSave->theta_dist_cs->Fill(cos(anomwtCS1.theta()));
+        if(anomwtCS1.hardSoft()<=0.2) histSave->theta_dist_ms->Fill(cos(thetaMustraal));
+
         histSave->Invariant_dist->Fill(anomwtCS1.Invariant());
 
         //std::cout<<"cosditrctTheta: "<<std::cos(anomwtPB1.directThetaVal())<<" mustralTheta: "<<std::cos(thetaMustraal)<<std::endl;
@@ -217,7 +221,7 @@ int main(int argc, char** argv) {
 
 
 
-    }
+    } //Event loop Ends here
 
 
     double avg_m2OverE2 = 0.0;
