@@ -46,6 +46,9 @@ public:
     TH1D* Invariant_dist = new TH1D("Invariant_dist", "Invariant Mass Distribution;Invariant Mass (GeV);Events", 100, 0.0, 6.0);
     TH1D* directTheta_dist = new TH1D("directTheta_dist", "Direct Theta Distribution;#theta;Events", 100, -1.0,1.0);
 
+    TH1D* phi_dist_cs = new TH1D("phi_dist_cs", "Phi Distribution;#phi;Events", 100, 0.0, 2.0*TMath::Pi());
+    TH1D* phi_dist_ms = new TH1D("phi_dist_ms", "Phi Distribution;#phi;Events", 100, 0.0, 2.0*TMath::Pi());
+
     TH1D* wtwPP = new TH1D("wtwPP", "wtwPP", 10000, 0.0, 1.0);
     TH1D* wtwMM = new TH1D("wtwMM", "wtwMM", 10000, 0.0, 1.0);
     TH1D* wtwPM = new TH1D("wtwPM", "wtwPM", 10000, 0.0, 1.0);

@@ -22,7 +22,7 @@ void AnomWt::compute() {
   for(auto& arr : { &H1, &H2, &P1, &P2, &PB1, &PB2}) {
       KinLib::BostDQ(1, QQ, *arr, *arr);
   }
-  //Invarian mass of tau pair system (s^\prime = (pbeam1 + pbeam2 - k)**2)
+  //Invariant mass of tau pair system (s^\prime = (pbeam1 + pbeam2 - k)**2)
   E = sqrt(pow((P1[0] + P2[0]), 2.) - pow((P1[1] + P2[1]), 2.) - pow((P1[2] + P2[2]), 2.) - pow((P1[3] + P2[3]), 2.)) / 2.0;   //Since we are adding the photon
 
   // 2) Rotate about z to eliminate y‐components of P2
@@ -43,28 +43,25 @@ void AnomWt::compute() {
 
   double thetataupair = std::acos(PB1[3]/(std::sqrt(PB1[1]*PB1[1] + PB1[2]*PB1[2] +PB1[3]*PB1[3])));
 
-//   // 4) Align beam‐difference to x–z plane
-//   double angle_1 = KinLib::ANGFI(PB1[1], PB1[2]);
-//   for(auto& arr : { &H1, &P1, &PB1}) {
-//         KinLib::ROTOD3(-angle_1, *arr, *arr);
-//   }
-//   double angle_2 = KinLib::ANGFI(PB2[1], PB2[2]);
-//   for(auto& arr : { &H2, &P2, &PB2}) {
-//         KinLib::ROTOD3(-angle_2, *arr, *arr);
-//   }
-
   // 4) Align beam‐difference to x–z plane
   switch(frameOption){
       case 1:
           for(int k=0; k<4; ++k) PBB[k] = PB1[k] - PB2[k];//Collins-Soper frame
+          m_phi = std::atan2(PB1[2], PB1[1]);
+          if(m_phi<0) m_phi += 2.0*TMath::Pi();   // to have phi in [0, 2pi)
           break;
       case 2:
           for(int k=0; k<4; ++k) PBB[k] = PB1[k];
+          m_phi = std::atan2(PB1[2], PB1[1]);
+          if(m_phi<0) m_phi += 2.0*TMath::Pi();   // to have phi in [0, 2pi)
           break;
       case 3:
-          for(int k=0; k<4; ++k) PBB[k] = PB2[k];
+          for(int k=0; k<4; ++k) PBB[k] = -PB2[k];
+          m_phi = std::atan2(-PB2[2], -PB2[1]);
+          if(m_phi<0) m_phi += 2.0*TMath::Pi();   // to have phi in [0, 2pi)
           break;
   }
+
 
 
   //double fi1 = KinLib::ANGFI(PBB[1], PBB[2]);

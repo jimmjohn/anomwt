@@ -59,7 +59,7 @@ int main(int argc, char** argv) {
     int printEvts = 0;
     int countSelected = 0;
     double beamEnergy;
-    double invariantCut = 3.0; // GeV
+    double invariantCut = 11.0; // GeV
     double sum_m2OverE2CS = 0.0;
 
     //Try reading using HepMC3 Reader
@@ -167,14 +167,24 @@ int main(int argc, char** argv) {
         double wtMustraal0 = anomwtPB1.prob()*anomwtPB1.wtSPIN0() + anomwtPB2.prob()*anomwtPB2.wtSPIN0();
         double wtMustraal = anomwtPB1.prob()*anomwtPB1.wtSPIN() + anomwtPB2.prob()*anomwtPB2.wtSPIN();
 
-        double thetaMustraal;
+        double thetaMustraal, phiMustraal;
         double approxHel1MS, approxHel2MS;
-        if(anomwtPB1.prob()>anomwtPB2.prob()) {thetaMustraal = anomwtPB1.theta();approxHel1MS = anomwtPB1.approxHel1(); approxHel2MS = anomwtPB1.approxHel2();}
-        else {thetaMustraal = anomwtPB2.theta(); approxHel1MS = anomwtPB2.approxHel1(); approxHel2MS = anomwtPB2.approxHel2();}
+        if(anomwtPB1.prob()>anomwtPB2.prob()) {
+            thetaMustraal = anomwtPB1.theta();
+            phiMustraal = anomwtPB1.phi();
+            approxHel1MS = anomwtPB1.approxHel1();
+            approxHel2MS = anomwtPB1.approxHel2();
+        }
+        else {
+            thetaMustraal = anomwtPB2.theta();
+            phiMustraal = anomwtPB2.phi();
+            approxHel1MS = anomwtPB2.approxHel1();
+            approxHel2MS = anomwtPB2.approxHel2();
+        }
 
         if(cos(anomwtCS1.theta())<0.05 && cos(anomwtCS1.theta())>-0.05) {
         //if(cos(anomwtCS1.theta())>0.98) {
-        //if(anomwtCS1.hardSoft()<=0.2) {
+        //if(anomwtCS1.hardSoft()<=0.02) {
         //if(1) {
             //std::cout<<cos(anomwtCS1.theta())<<" "<<cos(thetaMustraal)<<std::endl;
             histSave->helicity_corr->Fill(evtIn.heTaum, evtIn.heTaul);
@@ -185,7 +195,7 @@ int main(int argc, char** argv) {
             histSave->wtwMP->Fill(anomwtCS1.getwtw()[1][0]);
         }
         //if(cos(thetaMustraal)<0.05 && cos(thetaMustraal)>-0.05) {
-        if(anomwtCS1.hardSoft()<=0.2) {
+        if(anomwtCS1.hardSoft()<=0.02) {
         //if(1) {
             histSave->helicity_corr_st_mustraal->Fill(approxHel1MS, approxHel2MS);
         }
@@ -194,12 +204,12 @@ int main(int argc, char** argv) {
         histSave->H2->SetPoint(nevts, anomwtCS1.getH2vec().X(), anomwtCS1.getH2vec().Y(), anomwtCS1.getH2vec().Z());
         histSave->H1_H2->SetPoint(nevts, anomwtCS1.getH1vec().X() - anomwtCS1.getH2vec().X(), anomwtCS1.getH1vec().Y() - anomwtCS1.getH2vec().Y(), anomwtCS1.getH1vec().Z() - anomwtCS1.getH2vec().Z());
 
-        if(anomwtCS1.hardSoft()<=0.2) {
+        if(anomwtCS1.hardSoft()<=0.02) {
             histSave->collins_soper_corr_soft->Fill(evtIn.wt, anomwtCS1.wtSPIN0());
             histSave->p1_frame_corr_soft->Fill(evtIn.wt, anomwtPB1.wtSPIN0());
             histSave->p2_frame_corr_soft->Fill(evtIn.wt, anomwtPB2.wtSPIN0());
             histSave->mustraal_corr_soft->Fill(evtIn.wt, wtMustraal0);
-        } else if(anomwtCS1.hardSoft()<0.98 && anomwtCS1.hardSoft()>0.2) {
+        } else if(anomwtCS1.hardSoft()<0.8 && anomwtCS1.hardSoft()>0.02) {
             histSave->collins_soper_corr_hard->Fill(evtIn.wt, anomwtCS1.wtSPIN0());
             histSave->p1_frame_corr_hard->Fill(evtIn.wt, anomwtPB1.wtSPIN0());
             histSave->p2_frame_corr_hard->Fill(evtIn.wt, anomwtPB2.wtSPIN0());
@@ -208,10 +218,16 @@ int main(int argc, char** argv) {
 
         beamEnergy = evtIn.beamEnergy;
 
-        // if(anomwtCS1.Invariant()<invariantCut) histSave->theta_dist_cs->Fill(cos(anomwtCS1.theta()));
-        // if(anomwtPB1.Invariant()<invariantCut) histSave->theta_dist_ms->Fill(cos(thetaMustraal));
-        if(anomwtCS1.hardSoft()<=0.2) histSave->theta_dist_cs->Fill(cos(anomwtCS1.theta()));
-        if(anomwtCS1.hardSoft()<=0.2) histSave->theta_dist_ms->Fill(cos(thetaMustraal));
+        if(anomwtCS1.Invariant()<invariantCut) {
+            histSave->theta_dist_cs->Fill(cos(anomwtCS1.theta()));
+            histSave->phi_dist_cs->Fill(anomwtCS1.phi());
+        }
+        if(anomwtPB1.Invariant()<invariantCut) {
+            histSave->theta_dist_ms->Fill(cos(thetaMustraal));
+            histSave->phi_dist_ms->Fill(phiMustraal);
+        }
+        // if(anomwtCS1.hardSoft()<=0.02) histSave->theta_dist_cs->Fill(cos(anomwtCS1.theta()));
+        // if(anomwtCS1.hardSoft()<=0.02) histSave->theta_dist_ms->Fill(cos(thetaMustraal));
 
         histSave->Invariant_dist->Fill(anomwtCS1.Invariant());
 
@@ -255,7 +271,7 @@ int main(int argc, char** argv) {
     histSave->DrawHistograms(beamEnergy, avg_m2OverE2);
 
 
-//    theApp.Run();  // Keeps the GUI open
+    //theApp.Run();  // Keeps the GUI open
 
     return 0;
 }

@@ -45,6 +45,7 @@ public:
     double wtSPIN()      const { return m_wtSPIN; }
     double wtSPIN0()     const { return m_wtSPIN0; }
     double theta()       const { return m_theta; }
+    double phi()         const { return m_phi; }
     double Invariant()         const { return E; }
     double hardSoft()    const { return m_hardSoft; }
     double prob()        const { return m_prob; }
@@ -76,7 +77,7 @@ private:
 
     // Outputs
     double m_wtME{1.0}, m_wtSPIN{1.0}, m_wtSPIN0{1.0};
-    double m_theta{0.0}, m_hardSoft{0.0}, m_prob{1.0};
+    double m_theta{0.0}, m_phi{0.0}, m_hardSoft{0.0}, m_prob{1.0};
     double m_spinWeight_approx{0.0};
     int m_hel1{0}, m_hel2{0};
     bool m_selected{true};

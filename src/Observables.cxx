@@ -29,7 +29,7 @@ void Observables::Acoplanarity(EventInitilizers& evtIn) {
   acoplanarity_angle = n1.Angle(n2);//Here the main issue is it will go from [0, pi].
   // Define a reference axis (e.g., the direction of one of the rhos, or their sum)
   TVector3 ref = (pipm + pizm).Unit();
-  double sign_ang = ref.Dot(n1.Cross(n2)); // Scalar triple product
+  double sign_ang = ref.Dot(n2.Cross(n1)); // Scalar triple product
   if (sign_ang < 0) acoplanarity_angle = 2 * TMath::Pi() - acoplanarity_angle; // Now acc_angle in [0, 2pi]
 
   //Checking direction of polarimetric vectors

@@ -400,6 +400,22 @@ void HistManager::DrawHistograms(double beamEnergy, double avg_m2OverE2) {
     ratio->Draw("hist");
     c17->Update();
 
+    TCanvas* c17b = new TCanvas("c17b", "Phi Distribution", 800, 600);
+    phi_dist_cs->SetStats(0);
+    phi_dist_cs->GetXaxis()->SetTitle("#phi (radians)");
+    phi_dist_cs->GetYaxis()->SetTitle("Events");
+    phi_dist_cs->SetTitle("Phi Distribution");
+    phi_dist_cs->GetXaxis()->CenterTitle();
+    phi_dist_cs->GetYaxis()->CenterTitle();
+    phi_dist_cs->SetMarkerStyle(20);
+    phi_dist_cs->SetMarkerSize(0.5);
+    phi_dist_cs->SetLineColor(kRed);
+    c17b->SetGrid();
+    phi_dist_cs->Draw("hist");
+    phi_dist_ms->SetLineColor(kBlue);
+    phi_dist_ms->Draw("hist same");
+    c17b->Update();
+
     TCanvas* c18 = new TCanvas("c18", "Invariant Mass Distribution", 800, 600);
     Invariant_dist->SetStats(0);
     Invariant_dist->GetXaxis()->SetTitle("Invariant Mass (GeV)");
@@ -511,6 +527,7 @@ void HistManager::DrawHistograms(double beamEnergy, double avg_m2OverE2) {
     c15->Print(outFile);
     c16->Print(outFile);
     c17->Print(outFile);
+    c17b->Print(outFile);
     c18->Print(outFile);
     c19->Print(outFile);
     c20->Print(outFile);
